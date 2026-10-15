@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WM Labs | Innovation Launchpad & Product Aquarium</title>
+  <meta name="description" content="Explore cutting-edge software and hardware products in development at WM Labs through an interactive pixel art aquarium ecosystem.">
+  <meta name="keywords" content="WM Labs, technology launchpad, pixel art aquarium, cloud systems, AI vector database, cybersecurity">
+  <meta name="author" content="WM Labs">
+
+  <!-- OpenGraph / Social Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="WM Labs — Product Aquarium Launchpad">
+  <meta property="og:description" content="Click any fish in our digital aquarium to discover our developing tech products.">
+  <meta property="og:image" content="assets/og-preview.png">
+
+  <!-- Google Fonts: Pixelify Sans (Retro-Modern Pixel Art) & Plus Jakarta Sans (Premium UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Fullscreen Pixel Aquarium Simulation Canvas -->
+  <canvas id="aquarium-canvas" aria-label="Interactive Pixel Art Aquarium displaying WM Labs products as swimming fish"></canvas>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    
+    <!-- Header / Brand Navigation -->
+    <header class="site-header interactive" role="banner">
+      <div class="brand-group" id="brand-logo" title="WM Labs Home">
+        <div class="brand-icon-box">
+          <!-- Pixel fish SVG icon -->
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 4H14V6H10V8H6V10H2V14H6V16H10V18H14V20H18V18H20V16H22V8H20V6H18V4ZM16 8H18V10H16V8ZM14 10H16V14H14V10Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">WM LABS <span class="brand-tag">EXP</span></span>
+          <span class="brand-subtitle">Interactive Product Launchpad</span>
+        </div>
+      </div>
+
+      <!-- Navigation Bar -->
+      <nav class="nav-menu" role="navigation" aria-label="Main Navigation">
+        <button class="nav-link active" id="nav-home">
+          <span>Tank</span>
+        </button>
+        <button class="nav-link" id="nav-products">
+          <span>Products</span>
+        </button>
+        <button class="nav-link" id="nav-about">
+          <span>About Us</span>
+        </button>
+        <button class="nav-link" id="nav-contact">
+          <span>Contact</span>
+        </button>
+      </nav>
+
+      <!-- Action Tools -->
+      <div class="header-actions">
+        <button class="action-btn btn-feed" id="btn-feed" title="Drop food pellets into the tank (Press 'F')">
+          <span>🦐</span> Feed Tank
+        </button>
+        <button class="action-btn" id="btn-theme-toggle" title="Switch aquarium lighting">
+          <span>☀️</span> Sunlit Reef
+        </button>
+        <button class="action-btn icon-only" id="btn-sound-toggle" title="Toggle aquatic synthesizer audio" aria-label="Toggle Sound">
+          <span>🔇</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Footer Status Bar -->
+    <footer class="site-footer interactive" role="contentinfo">
+      <div class="tank-status-pill">
+        <span class="status-dot"></span>
+        <span id="tank-product-count">6 Products Swimming</span>
+      </div>
+
+      <div class="hint-chip">
+        <span>💡 Click any fish to inspect • Click water to drop food • <kbd>F</kbd> to feed</span>
+      </div>
+
+      <!-- Quick Fish Switcher Chips -->
+      <div class="quick-fish-chips" id="quick-chips-container" aria-label="Quick Select Products">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================================================
+       SLIDE-OVER PRODUCT DOSSIER DRAWER
+       ======================================================================== -->
+  <div class="product-drawer-overlay" id="product-drawer-overlay" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <aside class="product-drawer">
+      <div class="drawer-header">
+        <div class="drawer-nav-actions">
+          <button class="drawer-cycle-btn" id="drawer-prev-btn" title="Previous fish">◀ Prev</button>
+          <button class="drawer-cycle-btn" id="drawer-next-btn" title="Next fish">Next ▶</button>
+        </div>
+        <button class="modal-close-btn" id="drawer-close-btn" aria-label="Close product view">✕</button>
+      </div>
+
+      <!-- Hero Card -->
+      <div class="product-hero-card">
+        <div class="product-avatar-preview" id="drawer-avatar-preview">
+          <!-- Scaled pixel canvas injected here -->
+        </div>
+        <div class="product-meta-block">
+          <div class="product-badges-row">
+            <span class="badge-tag badge-status" id="drawer-status">In Development</span>
+            <span class="badge-tag badge-category" id="drawer-category">Core Tech</span>
+          </div>
+          <h2 class="product-title" id="drawer-title">Product Name</h2>
+          <p class="product-tagline" id="drawer-tagline">Short product tagline goes here.</p>
+        </div>
+      </div>
+
+      <!-- Technical Description -->
+      <div class="section-label">System Overview</div>
+      <p class="product-description-text" id="drawer-description">
+        Detailed product architecture overview.
+      </p>
+
+      <!-- Key Highlights -->
+      <div class="section-label">Architectural Highlights</div>
+      <ul class="highlights-list" id="drawer-highlights">
+        <!-- Injected dynamically -->
+      </ul>
+
+      <!-- Metrics -->
+      <div class="section-label">Benchmark Metrics</div>
+      <div class="metrics-grid" id="drawer-metrics">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Launch Action Bar -->
+      <div class="drawer-footer">
+        <a href="#" class="btn-primary-launch" id="drawer-cta-btn" target="_blank" rel="noopener">
+          Launch Product Page <span>→</span>
+        </a>
+        <div class="domain-note">
+          Ready for custom domain routing (e.g. <code>aqua.wmlabs.com</code> or <code>wmlabs.com/products/aqua</code>)
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: PRODUCTS DIRECTORY
+       ======================================================================== -->
+  <div class="modal-overlay" id="modal-products" role="dialog" aria-modal="true" aria-labelledby="products-modal-title">
+    <div class="modal-window">
+      <button class="modal-close-btn" aria-label="Close modal">✕</button>
+      <div class="content-modal-header">
+        <h2 class="modal-main-title" id="products-modal-title">Active R&amp;D Products</h2>
+        <p class="modal-main-subtitle">
+          Every fish currently swimming in the aquarium represents an active engineering project.
+        </p>
+      </div>
+      <div class="products-grid" id="products-directory-grid">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: ABOUT US
+       ======================================================================== -->
+  <div class="modal-overlay" id="modal-about" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+    <div class="modal-window">
+      <button class="modal-close-btn" aria-label="Close modal">✕</button>
+      <div class="content-modal-header">
+        <h2 class="modal-main-title" id="about-modal-title">About WM Labs</h2>
+        <p class="modal-main-subtitle">Pioneering the Next Generation of Autonomous Systems &amp; Web Technologies</p>
+      </div>
+      <div class="manifesto-body">
+        <p>
+          At <strong>WM Labs</strong>, we cultivate breakthrough software products the way an ecosystem cultivates life. Our digital aquarium symbolizes our approach: each product is a living organism swimming in a shared technological sea, interacting, evolving, and growing.
+        </p>
+        <p>
+          Founded by systems engineers and digital artisans, we specialize in high-concurrency micro-kernels, real-time vector analytics, post-quantum networking fabrics, and modern micro-graphic web interfaces.
+        </p>
+        <div class="section-label" style="margin-top: 0.5rem;">Core Philosophy</div>
+        <ul class="highlights-list">
+          <li><strong>Zero Bloat:</strong> Minimalist runtimes crafted for maximum speed and predictable latency.</li>
+          <li><strong>Aesthetic Rigor:</strong> Software should not only function flawlessly—it should inspire through visual and tactile delight.</li>
+          <li><strong>Continuous Growth:</strong> New projects are continuously seeded into our live testbed.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: CONTACT
+       ======================================================================== -->
+  <div class="modal-overlay" id="modal-contact" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+    <div class="modal-window">
+      <button class="modal-close-btn" aria-label="Close modal">✕</button>
+      <div class="content-modal-header">
+        <h2 class="modal-main-title" id="contact-modal-title">Connect with WM Labs</h2>
+        <p class="modal-main-subtitle">Have questions about our products or interested in partnering? Reach out below.</p>
+      </div>
+      <form id="contact-form" class="contact-form-grid">
+        <div class="form-group">
+          <label for="contact-name">Your Name</label>
+          <input type="text" id="contact-name" placeholder="Ada Lovelace" required>
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Email Address</label>
+          <input type="email" id="contact-email" placeholder="ada@domain.com" required>
+        </div>
+        <div class="form-group">
+          <label for="contact-subject">Topic of Interest</label>
+          <input type="text" id="contact-subject" placeholder="Partnership / Early Access / Career" required>
+        </div>
+        <div class="form-group">
+          <label for="contact-message">Message</label>
+          <textarea id="contact-message" placeholder="Tell us how we can collaborate..." required></textarea>
+        </div>
+        <button type="submit" class="btn-primary-launch" style="margin-top: 0.5rem;">
+          Send Transmission <span>→</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: DEVELOPER GUIDE (SCALABILITY HINT FOR COMPANY)
+       ======================================================================== -->
+  <div class="modal-overlay" id="modal-dev-guide" role="dialog" aria-modal="true" aria-labelledby="dev-modal-title">
+    <div class="modal-window">
+      <button class="modal-close-btn" aria-label="Close modal">✕</button>
+      <div class="content-modal-header">
+        <h2 class="modal-main-title" id="dev-modal-title">Adding Future Products</h2>
+        <p class="modal-main-subtitle">How WM Labs can seamlessly add more product fish to this launchpad.</p>
+      </div>
+      <div class="manifesto-body">
+        <p>
+          The launchpad is 100% data-driven. To add a new product page and fish, simply append an entry to <code>js/products-data.js</code>:
+        </p>
+        <pre class="code-box"><code>{
+  id: 'new-product',
+  name: 'Project Chronos',
+  tagline: 'Predictive Scheduling Engine',
+  species: 'clownfish', // clownfish | angelfish | neontetra | pufferfish | koi | guppy
+  category: 'Autonomous Systems',
+  status: 'In Development',
+  releaseEta: 'Q4 2027',
+  accentColor: '#38BDF8',
+  url: 'https://chronos.wmlabs.com', // Links to individual product page
+  description: '...',
+  highlights: ['...'],
+  metrics: { latency: '&lt; 1ms' }
+}</code></pre>
+        <p>
+          The engine will automatically instantiate the sprite, allocate physics, assign waypoints, and hook navigation seamlessly.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Developer Helper Pill -->
+  <button class="dev-helper-pill interactive" id="dev-helper-pill" title="View how to add new products in the code">
+    <span>⚡</span>
+    <span>Extensible Architecture Guide</span>
+  </button>
+
+  <!-- Script Modules (Ordered Execution) -->
+  <script src="js/products-data.js"></script>
+  <script src="js/pixel-sprites.js"></script>
+  <script src="js/sound-effects.js"></script>
+  <script src="js/aquarium-engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
