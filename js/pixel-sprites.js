@@ -62,39 +62,41 @@ const PixelSprites = (() => {
     ".............KKKKKK............."
   ];
 
-  // 6 vibrant product color palettes
+  // Vibrant product color palettes
   const colorPalettes = {
-    // 1. Vibrant Goldfish Orange (AquaOS) - matching the hero orange fish
-    clownfish: {
+    orange: {
       C: '#FF7A29', c: '#C43D04', H: '#FFA756', B: '#FFF1D6', F: '#FF8833', f: '#A32F00',
       W: '#FFFFFF', E: '#0B132B', G: '#FFFFFF', K: '#0B132B'
     },
-    // 2. Electric Cyan / Neon Blue (HyperStream)
-    neontetra: {
+    cyan: {
       C: '#00D2FF', c: '#006FA8', H: '#7DE6FF', B: '#E0F8FF', F: '#38BDF8', f: '#0284C7',
       W: '#FFFFFF', E: '#0B132B', G: '#FFFFFF', K: '#0B132B'
     },
-    // 3. Mint / Emerald Green (DeepQuery)
-    angelfish: {
+    green: {
       C: '#10B981', c: '#046A4E', H: '#6EE7B7', B: '#ECFDF5', F: '#34D399', f: '#065F46',
       W: '#FFFFFF', E: '#0B132B', G: '#FFFFFF', K: '#0B132B'
     },
-    // 4. Radiant Golden Sunfish (VaultPulse)
-    pufferfish: {
+    yellow: {
       C: '#FBBF24', c: '#B45309', H: '#FDE68A', B: '#FFFBEB', F: '#FCD34D', f: '#92400E',
       W: '#FFFFFF', E: '#0B132B', G: '#FFFFFF', K: '#0B132B'
     },
-    // 5. Ruby Coral / Magenta (Aura Compute)
-    koi: {
+    red: {
       C: '#F43F5E', c: '#9F1239', H: '#FDA4AF', B: '#FFF1F2', F: '#FB7185', f: '#881337',
       W: '#FFFFFF', E: '#0B132B', G: '#FFFFFF', K: '#0B132B'
     },
-    // 6. Royal Cyber Violet (PixelForge UI)
-    guppy: {
+    purple: {
       C: '#A855F7', c: '#6B21A8', H: '#D8B4FE', B: '#FAF5FF', F: '#C084FC', f: '#581C87',
       W: '#FFFFFF', E: '#0B132B', G: '#FFFFFF', K: '#0B132B'
     }
   };
+
+  // Aliases for backwards compatibility
+  colorPalettes.clownfish = colorPalettes.orange;
+  colorPalettes.neontetra = colorPalettes.cyan;
+  colorPalettes.angelfish = colorPalettes.green;
+  colorPalettes.pufferfish = colorPalettes.yellow;
+  colorPalettes.koi = colorPalettes.red;
+  colorPalettes.guppy = colorPalettes.purple;
 
   // --- DIVERSE UNDERWATER SCENERY SPRITES (MATCHING LAUNCH PREVIEW) ---
 
@@ -447,26 +449,41 @@ const PixelSprites = (() => {
     ctx.restore();
   }
 
-  // Draw glossy pixel bubble
+  // Draw glossy pixel bubble (supporting tiny 2px micro-bubbles up to giant 38px spheres)
   function drawPixelBubble(ctx, x, y, radius, opacity = 0.85) {
     ctx.save();
     ctx.globalAlpha = opacity;
-    const r = Math.max(3, Math.round(radius));
+    const r = Math.max(2, Math.round(radius));
 
+    if (r <= 3) {
+      // Tiny micro-bubble
+      ctx.fillStyle = '#BAE6FD';
+      ctx.fillRect(Math.round(x - r), Math.round(y - r), r * 2, r * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(Math.round(x - r + 1), Math.round(y - r + 1), 1, 1);
+      ctx.restore();
+      return;
+    }
+
+    // Outer cyan/sky ring
     ctx.fillStyle = '#BAE6FD';
     ctx.fillRect(Math.round(x - r + 1), Math.round(y - r), (r - 1) * 2, r * 2);
     ctx.fillRect(Math.round(x - r), Math.round(y - r + 1), r * 2, (r - 1) * 2);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+    // Inner translucent sphere body
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
     ctx.fillRect(Math.round(x - r + 2), Math.round(y - r + 2), (r - 2) * 2, (r - 2) * 2);
 
+    // Primary bright specular glint on upper-left
     ctx.fillStyle = '#FFFFFF';
     const hlSize = Math.max(2, Math.floor(r * 0.45));
     ctx.fillRect(Math.round(x - Math.floor(r * 0.55)), Math.round(y - Math.floor(r * 0.55)), hlSize, hlSize);
 
-    if (r >= 8) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-      ctx.fillRect(Math.round(x + Math.floor(r * 0.3)), Math.round(y + Math.floor(r * 0.3)), 2, 2);
+    // Secondary lower reflection for medium-to-giant bubbles
+    if (r >= 9) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+      const secSize = Math.max(2, Math.floor(r * 0.22));
+      ctx.fillRect(Math.round(x + Math.floor(r * 0.35)), Math.round(y + Math.floor(r * 0.35)), secSize, secSize);
     }
 
     ctx.restore();
@@ -474,7 +491,22 @@ const PixelSprites = (() => {
 
   return {
     init: initSprites,
-    getFrames: (species) => cache[species] || cache['clownfish'],
+    // Direct sprite lookup by product, color hex, or palette name
+    getFrames: (productOrKey) => {
+      if (!productOrKey) return cache['orange'];
+      if (typeof productOrKey === 'string') {
+        return cache[productOrKey] || cache['orange'];
+      }
+      // If product object passed, match by accentColor
+      const color = (productOrKey.accentColor || '').toUpperCase();
+      if (color.includes('FF6B') || color.includes('FF7A')) return cache['orange'];
+      if (color.includes('38EF') || color.includes('10B9')) return cache['green'];
+      if (color.includes('00F2') || color.includes('00D2') || color.includes('38BD')) return cache['cyan'];
+      if (color.includes('FFE0') || color.includes('FBBF')) return cache['yellow'];
+      if (color.includes('FF41') || color.includes('F43F')) return cache['red'];
+      if (color.includes('9D4E') || color.includes('A855')) return cache['purple'];
+      return cache['orange'];
+    },
     getScenery: (key) => cache[key],
     drawPixelKelp,
     drawPixelBubble

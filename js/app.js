@@ -8,11 +8,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('aquarium-canvas');
 
-  // Modals & Drawers
-  const productDrawerOverlay = document.getElementById('product-drawer-overlay');
-  const drawerCloseBtn = document.getElementById('drawer-close-btn');
-  const drawerPrevBtn = document.getElementById('drawer-prev-btn');
-  const drawerNextBtn = document.getElementById('drawer-next-btn');
+  // Modals & Windows
+  const productModalOverlay = document.getElementById('product-modal-overlay');
+  const productModalCloseBtn = document.getElementById('product-modal-close-btn');
+  const modalPrevBtn = document.getElementById('modal-prev-btn');
+  const modalNextBtn = document.getElementById('modal-next-btn');
 
   const productsModal = document.getElementById('modal-products');
   const aboutModal = document.getElementById('modal-about');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Aquarium Engine
   const aquarium = new AquariumEngine(canvas, {
     onFishClick: (product) => {
-      openProductDrawer(product);
+      openProductModal(product);
     }
   });
 
@@ -40,33 +40,34 @@ document.addEventListener('DOMContentLoaded', () => {
   populateProductsGrid();
 
   // ==========================================================================
-  // Product Drawer Logic
+  // Product Dossier Popup Modal Logic
   // ==========================================================================
-  function openProductDrawer(product) {
+  function openProductModal(product) {
     currentProductIndex = PRODUCTS_DATA.findIndex(p => p.id === product.id);
-    renderProductDrawerContent(product);
-    productDrawerOverlay.classList.add('active');
+    renderProductModalContent(product);
+    closeAllModals();
+    productModalOverlay.classList.add('active');
   }
 
-  function closeProductDrawer() {
-    productDrawerOverlay.classList.remove('active');
+  function closeProductModal() {
+    productModalOverlay.classList.remove('active');
   }
 
-  function renderProductDrawerContent(product) {
-    const drawer = productDrawerOverlay.querySelector('.product-drawer');
-    drawer.style.setProperty('--drawer-accent', product.accentColor || '#38BDF8');
+  function renderProductModalContent(product) {
+    const windowEl = productModalOverlay.querySelector('.product-modal-window');
+    windowEl.style.setProperty('--drawer-accent', product.accentColor || '#38BDF8');
 
-    document.getElementById('drawer-title').textContent = product.name;
-    document.getElementById('drawer-tagline').textContent = product.tagline;
-    document.getElementById('drawer-category').textContent = product.category;
-    document.getElementById('drawer-status').textContent = product.status;
-    document.getElementById('drawer-status').style.borderColor = product.accentColor || '#38BDF8';
-    document.getElementById('drawer-status').style.color = product.accentColor || '#38BDF8';
+    document.getElementById('modal-product-title').textContent = product.name;
+    document.getElementById('modal-tagline').textContent = product.tagline;
+    document.getElementById('modal-category').textContent = product.category;
+    document.getElementById('modal-status').textContent = product.status;
+    document.getElementById('modal-status').style.borderColor = product.accentColor || '#38BDF8';
+    document.getElementById('modal-status').style.color = product.accentColor || '#38BDF8';
 
-    document.getElementById('drawer-description').textContent = product.description;
+    document.getElementById('modal-description').textContent = product.description;
 
     // Highlights
-    const highlightsList = document.getElementById('drawer-highlights');
+    const highlightsList = document.getElementById('modal-highlights');
     highlightsList.innerHTML = '';
     product.highlights.forEach(h => {
       const li = document.createElement('li');
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Metrics
-    const metricsGrid = document.getElementById('drawer-metrics');
+    const metricsGrid = document.getElementById('modal-metrics');
     metricsGrid.innerHTML = '';
     if (product.metrics) {
       Object.entries(product.metrics).forEach(([k, v]) => {
@@ -90,20 +91,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // CTA Launch button
-    const ctaBtn = document.getElementById('drawer-cta-btn');
-    ctaBtn.href = product.url || '#';
-    ctaBtn.innerHTML = `Launch ${product.name} Page <span>→</span>`;
-    ctaBtn.style.background = `linear-gradient(135deg, ${product.accentColor}dd, ${product.accentColor}88)`;
+    const ctaBtn = document.getElementById('modal-cta-btn');
+    if (product.status === 'Coming Soon') {
+      ctaBtn.href = 'javascript:void(0)';
+      ctaBtn.removeAttribute('target');
+      ctaBtn.removeAttribute('rel');
+      ctaBtn.innerHTML = `Coming Soon <span>✦</span>`;
+      ctaBtn.style.opacity = '0.55';
+      ctaBtn.style.cursor = 'default';
+      ctaBtn.style.background = 'rgba(255, 255, 255, 0.12)';
+    } else {
+      ctaBtn.href = product.url || '#';
+      ctaBtn.target = '_blank';
+      ctaBtn.rel = 'noopener noreferrer';
+      ctaBtn.style.opacity = '1';
+      ctaBtn.style.cursor = 'pointer';
+      ctaBtn.innerHTML = `Open ${product.name} Site <span>→</span>`;
+      ctaBtn.style.background = `linear-gradient(135deg, ${product.accentColor}dd, ${product.accentColor}88)`;
+    }
 
     // Render Fish Avatar Preview Canvas
     renderAvatarCanvas(product);
   }
 
   function renderAvatarCanvas(product) {
-    const previewContainer = document.getElementById('drawer-avatar-preview');
+    const previewContainer = document.getElementById('modal-avatar-preview');
     previewContainer.innerHTML = '';
 
-    const frames = PixelSprites.getFrames(product.species);
+    const frames = PixelSprites.getFrames(product);
     if (frames && frames[0]) {
       const srcCanvas = frames[0];
       const previewCanvas = document.createElement('canvas');
@@ -116,27 +131,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Drawer cycle buttons (Next / Prev)
-  drawerPrevBtn.addEventListener('click', () => {
+  // Fish cycle buttons (Next / Prev)
+  modalPrevBtn.addEventListener('click', () => {
     currentProductIndex = (currentProductIndex - 1 + PRODUCTS_DATA.length) % PRODUCTS_DATA.length;
     const prod = PRODUCTS_DATA[currentProductIndex];
-    renderProductDrawerContent(prod);
+    renderProductModalContent(prod);
     aquarium.focusProduct(prod.id);
   });
 
-  drawerNextBtn.addEventListener('click', () => {
+  modalNextBtn.addEventListener('click', () => {
     currentProductIndex = (currentProductIndex + 1) % PRODUCTS_DATA.length;
     const prod = PRODUCTS_DATA[currentProductIndex];
-    renderProductDrawerContent(prod);
+    renderProductModalContent(prod);
     aquarium.focusProduct(prod.id);
   });
 
-  drawerCloseBtn.addEventListener('click', closeProductDrawer);
-  productDrawerOverlay.addEventListener('click', (e) => {
-    if (e.target === productDrawerOverlay) {
-      closeProductDrawer();
-    }
-  });
+  productModalCloseBtn.addEventListener('click', closeProductModal);
 
   // ==========================================================================
   // Products Directory Grid Modal
@@ -177,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   function openModal(modalEl) {
     closeAllModals();
-    closeProductDrawer();
     modalEl.classList.add('active');
   }
 
@@ -202,7 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Navigation Links
   navHomeBtn.addEventListener('click', () => {
     closeAllModals();
-    closeProductDrawer();
     navHomeBtn.classList.add('active');
   });
 
@@ -236,7 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeAllModals();
-      closeProductDrawer();
     }
   });
 });

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WM Labs | Innovation Launchpad</title>
   <meta name="description" content="Explore cutting-edge software and hardware products in development at WM Labs through an interactive pixel art aquarium.">
-  <meta name="keywords" content="WM Labs, technology launchpad, pixel art aquarium, cloud systems, AI vector database, cybersecurity">
+  <meta name="keywords" content="WM Labs, pixel art aquarium, cloud systems, AI vector database, cybersecurity">
   <meta name="author" content="WM Labs">
 
   <!-- OpenGraph / Social Metadata -->
@@ -39,7 +39,6 @@
         </div>
         <div class="brand-text">
           <span class="brand-title">WM LABS</span>
-          <span class="brand-subtitle">Interactive Product Launchpad</span>
         </div>
       </div>
 
@@ -62,61 +61,67 @@
   </div>
 
   <!-- ========================================================================
-       SLIDE-OVER PRODUCT DOSSIER DRAWER
+       MODAL: PRODUCT DOSSIER POPUP (OPENS WHEN USER CLICKS A FISH)
        ======================================================================== -->
-  <div class="product-drawer-overlay" id="product-drawer-overlay" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
-    <aside class="product-drawer">
-      <div class="drawer-header">
-        <div class="drawer-nav-actions">
-          <button class="drawer-cycle-btn" id="drawer-prev-btn" title="Previous fish">◀ Prev</button>
-          <button class="drawer-cycle-btn" id="drawer-next-btn" title="Next fish">Next ▶</button>
+  <div class="modal-overlay" id="product-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-product-title">
+    <div class="modal-window product-modal-window">
+      <button class="modal-close-btn" id="product-modal-close-btn" aria-label="Close product view">✕</button>
+
+      <div class="product-modal-header">
+        <div class="product-nav-actions">
+          <button class="modal-cycle-btn" id="modal-prev-btn" title="Previous fish">◀ Prev Fish</button>
+          <button class="modal-cycle-btn" id="modal-next-btn" title="Next fish">Next Fish ▶</button>
         </div>
-        <button class="modal-close-btn" id="drawer-close-btn" aria-label="Close product view">✕</button>
       </div>
 
-      <!-- Hero Card -->
-      <div class="product-hero-card">
-        <div class="product-avatar-preview" id="drawer-avatar-preview">
-          <!-- Scaled pixel canvas injected here -->
-        </div>
-        <div class="product-meta-block">
-          <div class="product-badges-row">
-            <span class="badge-tag badge-status" id="drawer-status">In Development</span>
-            <span class="badge-tag badge-category" id="drawer-category">Core Tech</span>
+      <div class="product-modal-grid">
+        <!-- Left Column: Hero Preview, Status, Metrics, and Action -->
+        <div class="product-modal-left">
+          <div class="product-hero-card">
+            <div class="product-avatar-preview" id="modal-avatar-preview">
+              <!-- Scaled pixel canvas injected here -->
+            </div>
+            <div class="product-meta-block">
+              <div class="product-badges-row">
+                <span class="badge-tag badge-status" id="modal-status">In Development</span>
+                <span class="badge-tag badge-category" id="modal-category">Core Tech</span>
+              </div>
+              <h2 class="product-title" id="modal-product-title">Product Name</h2>
+              <p class="product-tagline" id="modal-tagline">Short product tagline goes here.</p>
+            </div>
           </div>
-          <h2 class="product-title" id="drawer-title">Product Name</h2>
-          <p class="product-tagline" id="drawer-tagline">Short product tagline goes here.</p>
+
+          <!-- Benchmark Metrics -->
+          <div class="section-label">Key Specifications &amp; Metrics</div>
+          <div class="metrics-grid" id="modal-metrics">
+            <!-- Injected dynamically -->
+          </div>
+
+          <!-- Launch Action Bar -->
+          <div class="modal-footer-actions">
+            <a href="#" class="btn-primary-launch" id="modal-cta-btn" target="_blank" rel="noopener">
+              Launch Product Page <span>→</span>
+            </a>
+            <div class="domain-note">
+              Direct link to live product domain or proposal repository
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: System Overview & Architectural Highlights -->
+        <div class="product-modal-right">
+          <div class="section-label">System Overview</div>
+          <p class="product-description-text" id="modal-description">
+            Detailed product architecture overview.
+          </p>
+
+          <div class="section-label">Core Capabilities &amp; Highlights</div>
+          <ul class="highlights-list" id="modal-highlights">
+            <!-- Injected dynamically -->
+          </ul>
         </div>
       </div>
-
-      <!-- Technical Description -->
-      <div class="section-label">System Overview</div>
-      <p class="product-description-text" id="drawer-description">
-        Detailed product architecture overview.
-      </p>
-
-      <!-- Key Highlights -->
-      <div class="section-label">Architectural Highlights</div>
-      <ul class="highlights-list" id="drawer-highlights">
-        <!-- Injected dynamically -->
-      </ul>
-
-      <!-- Metrics -->
-      <div class="section-label">Benchmark Metrics</div>
-      <div class="metrics-grid" id="drawer-metrics">
-        <!-- Injected dynamically -->
-      </div>
-
-      <!-- Launch Action Bar -->
-      <div class="drawer-footer">
-        <a href="#" class="btn-primary-launch" id="drawer-cta-btn" target="_blank" rel="noopener">
-          Launch Product Page <span>→</span>
-        </a>
-        <div class="domain-note">
-          Direct link to product domain or subpage
-        </div>
-      </div>
-    </aside>
+    </div>
   </div>
 
   <!-- ========================================================================

@@ -130,58 +130,55 @@ class AquariumEngine {
     // 1. Reduced number of seaweed stalks (7 prominent stalks framing sides, leaving swimming space)
     this.kelpStalks = [
       // Left cluster (framing left edge)
-      { x: this.width * 0.04, baseY: this.height - 35, height: 430, swayOffset: 0.2, isFront: false },
-      { x: this.width * 0.09, baseY: this.height - 35, height: 350, swayOffset: 1.4, isFront: true },
-      { x: this.width * 0.16, baseY: this.height - 35, height: 260, swayOffset: 2.6, isFront: false },
+      { x: this.width * 0.04, baseY: this.height - 50, height: 440, swayOffset: 0.2, isFront: false },
+      { x: this.width * 0.09, baseY: this.height - 50, height: 360, swayOffset: 1.4, isFront: true },
+      { x: this.width * 0.16, baseY: this.height - 50, height: 280, swayOffset: 2.6, isFront: false },
 
       // Mid-ground subtle stalk
-      { x: this.width * 0.44, baseY: this.height - 35, height: 160, swayOffset: 3.1, isFront: false },
+      { x: this.width * 0.44, baseY: this.height - 50, height: 180, swayOffset: 3.1, isFront: false },
 
       // Right cluster (framing right edge)
-      { x: this.width * 0.77, baseY: this.height - 35, height: 220, swayOffset: 0.9, isFront: false },
-      { x: this.width * 0.88, baseY: this.height - 35, height: 360, swayOffset: 2.1, isFront: true },
-      { x: this.width * 0.95, baseY: this.height - 35, height: 440, swayOffset: 3.7, isFront: false }
+      { x: this.width * 0.77, baseY: this.height - 50, height: 240, swayOffset: 0.9, isFront: false },
+      { x: this.width * 0.88, baseY: this.height - 50, height: 380, swayOffset: 2.1, isFront: true },
+      { x: this.width * 0.95, baseY: this.height - 50, height: 460, swayOffset: 3.7, isFront: false }
     ];
 
-    // 2. Rich Tiered Coral Garden on Higher Sandbed
+    // 2. Rich Tiered Coral Garden with varied elevation nestled across the higher Sandbed
     this.sceneryProps = [
-      // Left Ridge
-      { type: 'rock_mound', x: this.width * 0.02, y: this.height - 110 },
-      { type: 'tube_sponges', x: this.width * 0.06, y: this.height - 152 },
-      { type: 'pink_anemone', x: this.width * 0.14, y: this.height - 124 },
-      { type: 'fire_coral', x: this.width * 0.21, y: this.height - 132 },
+      // Left Dune & Foreshore
+      { type: 'rock_mound', x: this.width * 0.03, y: this.height - 145 },
+      { type: 'tube_sponges', x: this.width * 0.07, y: this.height - 175 },
+      { type: 'pink_anemone', x: this.width * 0.15, y: this.height - 105 },
+      { type: 'fire_coral', x: this.width * 0.22, y: this.height - 145 },
 
-      // Center-Left Shelf & Valley
-      { type: 'moss_mound', x: this.width * 0.27, y: this.height - 90 },
-      { type: 'brain_coral', x: this.width * 0.33, y: this.height - 128 },
-      { type: 'cyan_staghorn', x: this.width * 0.41, y: this.height - 138 },
+      // Center-Left Sand Valley & Crest
+      { type: 'moss_mound', x: this.width * 0.28, y: this.height - 85 },
+      { type: 'brain_coral', x: this.width * 0.35, y: this.height - 118 },
+      { type: 'cyan_staghorn', x: this.width * 0.42, y: this.height - 155 },
 
-      // Center-Right Garden
-      { type: 'bubble_coral', x: this.width * 0.49, y: this.height - 126 },
-      { type: 'red_sea_fan', x: this.width * 0.57, y: this.height - 160 },
-      { type: 'moss_mound', x: this.width * 0.65, y: this.height - 92 },
+      // Center Basin & High Reef Ridge
+      { type: 'bubble_coral', x: this.width * 0.49, y: this.height - 100 },
+      { type: 'red_sea_fan', x: this.width * 0.58, y: this.height - 172 },
+      { type: 'moss_mound', x: this.width * 0.64, y: this.height - 90 },
 
-      // Right Tiered Reef Shelf
-      { type: 'rock_mound', x: this.width * 0.71, y: this.height - 112 },
-      { type: 'purple_tubes', x: this.width * 0.78, y: this.height - 168 },
-      { type: 'fire_coral', x: this.width * 0.85, y: this.height - 134 },
-      { type: 'cyan_staghorn', x: this.width * 0.91, y: this.height - 138 }
+      // Right Tiered Dune & Elevated Spire
+      { type: 'rock_mound', x: this.width * 0.72, y: this.height - 138 },
+      { type: 'purple_tubes', x: this.width * 0.79, y: this.height - 178 },
+      { type: 'fire_coral', x: this.width * 0.85, y: this.height - 120 },
+      { type: 'cyan_staghorn', x: this.width * 0.92, y: this.height - 158 }
     ];
 
-    // 3. Cute large background bubbles
-    this.bgBubbles = [];
-    const bgBubbleCount = Math.max(16, Math.floor(this.width / 70));
-    for (let i = 0; i < bgBubbleCount; i++) {
-      this.bgBubbles.push({
-        x: Math.random() * this.width,
-        y: Math.random() * this.height,
-        radius: 9 + Math.random() * 15,
-        vy: -0.4 - Math.random() * 0.5,
-        wobble: Math.random() * Math.PI * 2,
-        wobbleSpeed: 1.4 + Math.random() * 1.6,
-        opacity: 0.4 + Math.random() * 0.35
-      });
-    }
+    // 3. Ambient bubbles, with varied sizes (including delicate small bubbles and giant ones)
+    const bubbleSizes = [2.5, 3.0, 4.0, 5.0, 8.5, 14.0, 20.0, 26.0, 32.0, 38.0];
+    this.bgBubbles = bubbleSizes.map((radius, idx) => ({
+      x: (idx / bubbleSizes.length) * this.width + (Math.random() * 40 - 20),
+      y: Math.random() * this.height,
+      radius,
+      vy: -0.30 - (radius < 8 ? 0.22 : 0.10) - Math.random() * 0.2,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 1.2 + Math.random() * 1.5,
+      opacity: radius < 6 ? 0.80 : radius > 25 ? 0.60 : 0.45
+    }));
 
     // 4. Ambient light motes
     this.ambientMotes = [];
@@ -413,13 +410,13 @@ class AquariumEngine {
     const ctx = this.ctx;
     ctx.save();
 
-    // Higher, richer layered sandbed
-    const sandTop = this.height - 85;
-    const sandGrad = ctx.createLinearGradient(0, sandTop - 25, 0, this.height);
+    // Much higher, prominent layered sandbed (~135px to 165px from bottom)
+    const sandTop = this.height - 145;
+    const sandGrad = ctx.createLinearGradient(0, sandTop - 35, 0, this.height);
     sandGrad.addColorStop(0, '#f59e0b');
-    sandGrad.addColorStop(0.18, '#d97706');
-    sandGrad.addColorStop(0.45, '#b45309');
-    sandGrad.addColorStop(0.8, '#92400e');
+    sandGrad.addColorStop(0.15, '#d97706');
+    sandGrad.addColorStop(0.40, '#b45309');
+    sandGrad.addColorStop(0.75, '#92400e');
     sandGrad.addColorStop(1, '#78350f');
 
     ctx.fillStyle = sandGrad;
@@ -428,7 +425,7 @@ class AquariumEngine {
 
     const step = 35;
     for (let x = 0; x <= this.width + step; x += step) {
-      const duneY = sandTop + Math.sin(x * 0.012 + 1.2) * 14 + Math.cos(x * 0.025) * 8;
+      const duneY = sandTop + Math.sin(x * 0.010 + 1.2) * 18 + Math.cos(x * 0.022) * 10;
       ctx.lineTo(x, duneY);
     }
     ctx.lineTo(this.width, this.height);
@@ -438,14 +435,14 @@ class AquariumEngine {
 
     // Sand dune crest highlight
     ctx.strokeStyle = '#fde68a';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
     ctx.stroke();
 
     // Golden sand & gravel textured flecks
-    const fleckCount = Math.floor(this.width / 16);
+    const fleckCount = Math.floor(this.width / 14);
     for (let i = 0; i < fleckCount; i++) {
-      const fx = (i / fleckCount) * this.width + ((i * 37) % 22);
-      const fy = (sandTop + 14) + ((i * 19) % (this.height - sandTop - 18));
+      const fx = (i / fleckCount) * this.width + ((i * 37) % 24);
+      const fy = (sandTop + 18) + ((i * 19) % (this.height - sandTop - 24));
       ctx.fillStyle = (i % 3 === 0) ? '#fef08a' : (i % 3 === 1) ? '#fbbf24' : '#d97706';
       ctx.fillRect(Math.round(fx), Math.round(fy), 2, 2);
     }
@@ -495,7 +492,7 @@ class FishEntity {
     this.waypointTimer = 3 + Math.random() * 5;
 
     // Sprite is static (no tail wagging animation needed)
-    this.frames = PixelSprites.getFrames(product.species);
+    this.frames = PixelSprites.getFrames(product);
     this.sprite = this.frames[0];
 
     this.isHovered = false;
@@ -512,7 +509,7 @@ class FishEntity {
   pickNewWaypoint() {
     const pad = 140;
     this.targetX = pad + Math.random() * (this.engine.width - pad * 2);
-    this.targetY = 120 + Math.random() * (this.engine.height - 270);
+    this.targetY = 120 + Math.random() * (this.engine.height - 330);
     this.waypointTimer = 4 + Math.random() * 6;
   }
 
@@ -562,6 +559,36 @@ class FishEntity {
       }
     }
 
+    // Fish-to-fish proximity detection & collision avoidance (turn away before overlapping)
+    let repelVx = 0;
+    let repelVy = 0;
+    const personalSpace = 160; // Safe distance between fish centers
+
+    for (const other of engine.fishList) {
+      if (other === this) continue;
+      const fdx = this.x - other.x;
+      const fdy = this.y - other.y;
+      const fdist = Math.hypot(fdx, fdy);
+
+      if (fdist < personalSpace && fdist > 0.1) {
+        // Force increases strongly as fish get closer
+        const factor = (personalSpace - fdist) / personalSpace; // 0 to 1
+        const nx = fdx / fdist;
+        const ny = fdy / fdist;
+
+        repelVx += nx * factor * 2.4;
+        repelVy += ny * factor * 1.8;
+
+        // If on direct collision course, steer waypoint away and reverse target direction
+        if (fdist < 110) {
+          this.pickNewWaypoint();
+          if (Math.sign(this.vx) === Math.sign(other.vx) || Math.abs(fdx) < 80) {
+            this.targetX = this.x + (fdx >= 0 ? 200 : -200);
+          }
+        }
+      }
+    }
+
     this.waypointTimer -= dt;
     if (this.waypointTimer <= 0) {
       this.pickNewWaypoint();
@@ -576,8 +603,19 @@ class FishEntity {
       const targetVx = (dx / distToTarget) * speed;
       const targetVy = (dy / distToTarget) * (speed * 0.6);
 
-      this.vx += (targetVx - this.vx) * (dt * 1.5);
-      this.vy += (targetVy - this.vy) * (dt * 1.5);
+      this.vx += (targetVx - this.vx) * (dt * 1.5) + repelVx * (dt * 2.5);
+      this.vy += (targetVy - this.vy) * (dt * 1.5) + repelVy * (dt * 2.5);
+    } else {
+      this.vx += repelVx * (dt * 2.5);
+      this.vy += repelVy * (dt * 2.5);
+    }
+
+    // Clamp maximum velocity for natural, fluid gliding
+    const maxSpeed = this.isHovered ? 0.35 : 1.35;
+    const currentSpeed = Math.hypot(this.vx, this.vy);
+    if (currentSpeed > maxSpeed) {
+      this.vx = (this.vx / currentSpeed) * maxSpeed;
+      this.vy = (this.vy / currentSpeed) * maxSpeed;
     }
 
     // Smooth gliding with natural sinusoidal hydro-bob
@@ -590,7 +628,7 @@ class FishEntity {
     // Boundaries
     const padX = 85;
     const topPad = 110;
-    const bottomPad = engine.height - 140;
+    const bottomPad = engine.height - 150;
 
     if (this.x < padX) {
       this.x = padX;
@@ -648,20 +686,20 @@ class FishEntity {
     const isHovered = this.isHovered;
     const badgeX = Math.round(this.x);
 
-    // 1. Product Name Badge ON TOP of the fish
-    const nameY = Math.round(this.y - this.h / 2 - 16);
+    // 1. Product Name Badge ON TOP of the fish (Enlarged for clear readability)
+    const nameY = Math.round(this.y - this.h / 2 - 20);
 
     ctx.save();
-    ctx.font = '600 12px "Pixelify Sans", monospace';
+    ctx.font = '700 15px "Pixelify Sans", "Plus Jakarta Sans", sans-serif';
     const text = this.product.name;
     const textMetrics = ctx.measureText(text);
-    const badgeW = textMetrics.width + 24;
-    const badgeH = 22;
+    const badgeW = Math.round(textMetrics.width + 34);
+    const badgeH = 28;
 
-    const bgAlpha = isHovered ? 0.96 : 0.72;
-    ctx.fillStyle = 'rgba(10, 16, 30, ' + bgAlpha + ')';
-    ctx.strokeStyle = isHovered ? (this.product.accentColor || '#38BDF8') : 'rgba(255, 255, 255, 0.25)';
-    ctx.lineWidth = 1.5;
+    const bgAlpha = isHovered ? 0.98 : 0.85;
+    ctx.fillStyle = 'rgba(8, 14, 28, ' + bgAlpha + ')';
+    ctx.strokeStyle = isHovered ? (this.product.accentColor || '#38BDF8') : 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = isHovered ? 2 : 1.5;
 
     const rx = Math.round(badgeX - badgeW / 2);
     const ry = Math.round(nameY - badgeH / 2);
@@ -669,22 +707,23 @@ class FishEntity {
     ctx.fillRect(rx, ry, badgeW, badgeH);
     ctx.strokeRect(rx, ry, badgeW, badgeH);
 
+    // Accent indicator dot/square
     ctx.fillStyle = this.product.accentColor || '#38BDF8';
-    ctx.fillRect(rx + 6, ry + 7, 7, 7);
+    ctx.fillRect(rx + 8, ry + 9, 10, 10);
 
-    ctx.fillStyle = isHovered ? '#FFFFFF' : '#E2E8F0';
+    ctx.fillStyle = isHovered ? '#FFFFFF' : '#F1F5F9';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, rx + 18, ry + badgeH / 2 + 1);
+    ctx.fillText(text, rx + 24, ry + badgeH / 2 + 1);
 
     // 2. "Click to inspect product →" position moved CLEARLY UNDER THE FISH
     if (isHovered) {
-      const hintY = Math.round(this.y + this.h / 2 + 20);
-      ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+      const hintY = Math.round(this.y + this.h / 2 + 22);
+      ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
       const hintText = 'Click to inspect product →';
       const hintMetrics = ctx.measureText(hintText);
-      const hintW = hintMetrics.width + 22;
-      const hintH = 24;
+      const hintW = hintMetrics.width + 24;
+      const hintH = 26;
 
       const hx = Math.round(badgeX - hintW / 2);
       const hy = Math.round(hintY - hintH / 2);
