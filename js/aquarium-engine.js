@@ -127,60 +127,45 @@ class AquariumEngine {
   }
 
   setupEnvironment() {
-    // 1. Varied-height Kelp Stalks (staggered naturally, not uniform!)
-    this.kelpStalks = [];
-    const stalkCount = Math.max(14, Math.floor(this.width / 65));
-    for (let i = 0; i < stalkCount; i++) {
-      const ratio = i / (stalkCount - 1);
-      const x = ratio * (this.width - 60) + 30 + (Math.random() * 20 - 10);
+    // 1. Reduced number of seaweed stalks (7 prominent stalks framing sides, leaving swimming space)
+    this.kelpStalks = [
+      // Left cluster (framing left edge)
+      { x: this.width * 0.04, baseY: this.height - 35, height: 430, swayOffset: 0.2, isFront: false },
+      { x: this.width * 0.09, baseY: this.height - 35, height: 350, swayOffset: 1.4, isFront: true },
+      { x: this.width * 0.16, baseY: this.height - 35, height: 260, swayOffset: 2.6, isFront: false },
 
-      // Staggered height profile matching reference preview:
-      let height;
-      if (ratio < 0.22) {
-        // Far left: Tall lush forest reaching high up!
-        height = 360 + Math.random() * 90;
-      } else if (ratio >= 0.22 && ratio < 0.45) {
-        // Mid-left: Medium-short behind boulders
-        height = 150 + Math.random() * 80;
-      } else if (ratio >= 0.45 && ratio < 0.65) {
-        // Center: Low to mid-height tufts
-        height = 110 + Math.random() * 90;
-      } else if (ratio >= 0.65 && ratio < 0.85) {
-        // Mid-right: Medium stalks
-        height = 240 + Math.random() * 90;
-      } else {
-        // Far right: Tall stalks
-        height = 340 + Math.random() * 80;
-      }
+      // Mid-ground subtle stalk
+      { x: this.width * 0.44, baseY: this.height - 35, height: 160, swayOffset: 3.1, isFront: false },
 
-      this.kelpStalks.push({
-        x,
-        baseY: this.height - 15,
-        height,
-        swayOffset: Math.random() * Math.PI * 2,
-        isFront: i % 2 === 0
-      });
-    }
+      // Right cluster (framing right edge)
+      { x: this.width * 0.77, baseY: this.height - 35, height: 220, swayOffset: 0.9, isFront: false },
+      { x: this.width * 0.88, baseY: this.height - 35, height: 360, swayOffset: 2.1, isFront: true },
+      { x: this.width * 0.95, baseY: this.height - 35, height: 440, swayOffset: 3.7, isFront: false }
+    ];
 
-    // 2. Tiered, Staggered Rocks and Diverse Corals (Not a flat horizontal line!)
+    // 2. Rich Tiered Coral Garden on Higher Sandbed
     this.sceneryProps = [
-      // Left Boulder Mound & Tube Sponges
-      { type: 'rock_mound', x: this.width * 0.03, y: this.height - 65 },
-      { type: 'tube_sponges', x: this.width * 0.07, y: this.height - 110 },
-      { type: 'pink_anemone', x: this.width * 0.16, y: this.height - 85 },
+      // Left Ridge
+      { type: 'rock_mound', x: this.width * 0.02, y: this.height - 110 },
+      { type: 'tube_sponges', x: this.width * 0.06, y: this.height - 152 },
+      { type: 'pink_anemone', x: this.width * 0.14, y: this.height - 124 },
+      { type: 'fire_coral', x: this.width * 0.21, y: this.height - 132 },
 
-      // Center-Left Sand Valley with Moss Mound & Cyan Staghorn
-      { type: 'moss_mound', x: this.width * 0.29, y: this.height - 48 },
-      { type: 'cyan_staghorn', x: this.width * 0.36, y: this.height - 95 },
+      // Center-Left Shelf & Valley
+      { type: 'moss_mound', x: this.width * 0.27, y: this.height - 90 },
+      { type: 'brain_coral', x: this.width * 0.33, y: this.height - 128 },
+      { type: 'cyan_staghorn', x: this.width * 0.41, y: this.height - 138 },
 
-      // Center-Right Elevated Plateau with Red Sea Fan
-      { type: 'red_sea_fan', x: this.width * 0.52, y: this.height - 120 },
-      { type: 'moss_mound', x: this.width * 0.61, y: this.height - 52 },
+      // Center-Right Garden
+      { type: 'bubble_coral', x: this.width * 0.49, y: this.height - 126 },
+      { type: 'red_sea_fan', x: this.width * 0.57, y: this.height - 160 },
+      { type: 'moss_mound', x: this.width * 0.65, y: this.height - 92 },
 
-      // Right Tiered Reef Shelf with Rocks & Purple Tubes
-      { type: 'rock_mound', x: this.width * 0.72, y: this.height - 70 },
-      { type: 'purple_tubes', x: this.width * 0.81, y: this.height - 125 },
-      { type: 'cyan_staghorn', x: this.width * 0.90, y: this.height - 95 }
+      // Right Tiered Reef Shelf
+      { type: 'rock_mound', x: this.width * 0.71, y: this.height - 112 },
+      { type: 'purple_tubes', x: this.width * 0.78, y: this.height - 168 },
+      { type: 'fire_coral', x: this.width * 0.85, y: this.height - 134 },
+      { type: 'cyan_staghorn', x: this.width * 0.91, y: this.height - 138 }
     ];
 
     // 3. Cute large background bubbles
@@ -428,19 +413,22 @@ class AquariumEngine {
     const ctx = this.ctx;
     ctx.save();
 
-    const sandGrad = ctx.createLinearGradient(0, this.height - 55, 0, this.height);
-    sandGrad.addColorStop(0, '#d97706');
-    sandGrad.addColorStop(0.2, '#b45309');
-    sandGrad.addColorStop(0.6, '#92400e');
+    // Higher, richer layered sandbed
+    const sandTop = this.height - 85;
+    const sandGrad = ctx.createLinearGradient(0, sandTop - 25, 0, this.height);
+    sandGrad.addColorStop(0, '#f59e0b');
+    sandGrad.addColorStop(0.18, '#d97706');
+    sandGrad.addColorStop(0.45, '#b45309');
+    sandGrad.addColorStop(0.8, '#92400e');
     sandGrad.addColorStop(1, '#78350f');
 
     ctx.fillStyle = sandGrad;
     ctx.beginPath();
-    ctx.moveTo(0, this.height - 40);
+    ctx.moveTo(0, sandTop);
 
-    const step = 40;
+    const step = 35;
     for (let x = 0; x <= this.width + step; x += step) {
-      const duneY = (this.height - 40) + Math.sin(x * 0.015 + 1.2) * 8 + Math.cos(x * 0.03) * 4;
+      const duneY = sandTop + Math.sin(x * 0.012 + 1.2) * 14 + Math.cos(x * 0.025) * 8;
       ctx.lineTo(x, duneY);
     }
     ctx.lineTo(this.width, this.height);
@@ -448,11 +436,17 @@ class AquariumEngine {
     ctx.closePath();
     ctx.fill();
 
-    const fleckCount = Math.floor(this.width / 20);
+    // Sand dune crest highlight
+    ctx.strokeStyle = '#fde68a';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Golden sand & gravel textured flecks
+    const fleckCount = Math.floor(this.width / 16);
     for (let i = 0; i < fleckCount; i++) {
-      const fx = (i / fleckCount) * this.width + ((i * 37) % 20);
-      const fy = (this.height - 26) + ((i * 13) % 20);
-      ctx.fillStyle = (i % 2 === 0) ? '#fde68a' : '#f59e0b';
+      const fx = (i / fleckCount) * this.width + ((i * 37) % 22);
+      const fy = (sandTop + 14) + ((i * 19) % (this.height - sandTop - 18));
+      ctx.fillStyle = (i % 3 === 0) ? '#fef08a' : (i % 3 === 1) ? '#fbbf24' : '#d97706';
       ctx.fillRect(Math.round(fx), Math.round(fy), 2, 2);
     }
 
@@ -518,7 +512,7 @@ class FishEntity {
   pickNewWaypoint() {
     const pad = 140;
     this.targetX = pad + Math.random() * (this.engine.width - pad * 2);
-    this.targetY = 120 + Math.random() * (this.engine.height - 240);
+    this.targetY = 120 + Math.random() * (this.engine.height - 270);
     this.waypointTimer = 4 + Math.random() * 6;
   }
 
@@ -596,7 +590,7 @@ class FishEntity {
     // Boundaries
     const padX = 85;
     const topPad = 110;
-    const bottomPad = engine.height - 110;
+    const bottomPad = engine.height - 140;
 
     if (this.x < padX) {
       this.x = padX;

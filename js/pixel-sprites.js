@@ -199,7 +199,10 @@ const PixelSprites = (() => {
       ".....KCcDccDccDccDccDcK.........",
       "......KCDDDDDDDDDDDDDcK.........",
       ".......KDDDDDDDDDDDDDK..........",
-      ".........KKKKKKKKKKKK..........."
+      ".........KDDDDDDDDDDK...........",
+      ".........KDDDDDDDDDDK...........",
+      ".........KDDDDDDDDDDK...........",
+      ".........KKKKKKKKKKKK...........",
     ];
     return createMatrixSprite(m, palette, 3.5);
   }
@@ -221,6 +224,11 @@ const PixelSprites = (() => {
       "..KVvvvvvK....KVvvvvvVK.KVVVVVVK",
       "..KVvvvvvK....KVvvvvvVK.KVvvvvVK",
       "..KVvvvvvK.KK.KVvvvvvVK.KVvvvvvK",
+      "..KVvvvvvvKVvKKVvvvvvvKKKVvvvvvK",
+      "..KVvvvvvvKVvKKVvvvvvvKKKVvvvvvK",
+      "..KVvvvvvvKVvKKVvvvvvvKKKVvvvvvK",
+      "..KVvvvvvvKVvKKVvvvvvvKKKVvvvvvK",
+      "..KVvvvvvvKVvKKVvvvvvvKKKVvvvvvK",
       "..KVvvvvvvKVvKKVvvvvvvKKKVvvvvvK",
       "...KKKKKKKKKKKKKKKKKKKKKKKKKKKKK"
     ];
@@ -277,6 +285,83 @@ const PixelSprites = (() => {
     return createMatrixSprite(m, palette, 3);
   }
 
+  // 8. Golden Brain Coral (Grooved dome)
+  function createBrainCoral() {
+    const palette = {
+      'Y': '#FDE047', // Ridge highlight
+      'O': '#F59E0B', // Golden body
+      'D': '#B45309', // Groove shadow
+      'S': '#78350F', // Deep valley
+      'K': '#0F172A'
+    };
+    const m = [
+      ".......KKKKKKKKKK.......",
+      ".....KKYOYOYOYOYOKK.....",
+      "...KKYOYYODDDDOYYOYKK...",
+      "..KYOODDSYYYYYYSDDOOYK..",
+      ".KYODSYYODDDDDDOYYSDOYK.",
+      ".KYOSYODYYYYYYYYDOYSYOK.",
+      "KYODSYODDDDDDDDDDOYSDOYK",
+      "KYOSYYODYYYYYYYYDOYYSYOK",
+      "KYODSYODDDDDDDDDDOYSDOYK",
+      ".KYOSYYOYYYYYYYYDOYYSYOK.",
+      ".KYODDSSDDDDDDDDSSDOOYK.",
+      "..KYOODDDDDDDDDDDDDOOYK..",
+      "...KKSSSSSSSSSSSSSSKK...",
+      ".....KKKKKKKKKKKKKK....."
+    ];
+    return createMatrixSprite(m, palette, 3.4);
+  }
+
+  // 9. Electric Fire Coral (Branching flame cluster)
+  function createFireCoral() {
+    const palette = {
+      'F': '#FDE047', // Yellow tip
+      'O': '#FF6B00', // Fiery orange body
+      'D': '#C2410C', // Deep red-orange shadow
+      'K': '#0F172A'
+    };
+    const m = [
+      "...KK.....KK.....KK.....",
+      "..KFK....KFK....KFK.....",
+      "..KOK....KOK....KOK.....",
+      "..KOK...KOKOK...KOK.KK..",
+      "..KODKK.KODOK..KODOKFK..",
+      "..KODOKKKODOK..KODOKOK..",
+      "...KODOKODODOKKKODOKOK..",
+      "...KODODODODODODODODOK..",
+      "....KODDDDDDDDDDDDDOK...",
+      ".....KKODDDDDDDDDDKK....",
+      ".......KKKKKKKKKKK......"
+    ];
+    return createMatrixSprite(m, palette, 3.2);
+  }
+
+  // 10. Bubble / Pearl Coral (Cluster of glowing aquamarine vesicles)
+  function createBubbleCoral() {
+    const palette = {
+      'W': '#F0FDFA', // Glint
+      'G': '#6EE7B7', // Highlight
+      'T': '#14B8A6', // Body teal
+      'D': '#0F766E', // Shadow
+      'K': '#0F172A'
+    };
+    const m = [
+      ".......KKKKK............",
+      ".....KKWGGGTKK...KKKK...",
+      "....KWGGTTTTDK.KKWGTKK..",
+      "...KWGGTTTTTDKKWGTTTDK..",
+      "..KKDTTTTTTDKKWGTTTTTDK.",
+      ".KWGTKKKKKKDKDTTTTTTTDDK",
+      "KWGTTDK..KWGTTKKKKKKKK..",
+      "KTTTTDK.KWGTTTDK........",
+      ".KDTTDK.KDTTTTDK........",
+      "..KKKK...KDTTDK.........",
+      "..........KKKK.........."
+    ];
+    return createMatrixSprite(m, palette, 3.4);
+  }
+
   function initSprites() {
     // Generate authentic goldfish/koi in 6 product colorways
     Object.keys(colorPalettes).forEach(species => {
@@ -292,11 +377,14 @@ const PixelSprites = (() => {
     cache['purple_tubes'] = createPurpleTubes();
     cache['red_sea_fan'] = createRedSeaFan();
     cache['moss_mound'] = createMossMound();
+    cache['brain_coral'] = createBrainCoral();
+    cache['fire_coral'] = createFireCoral();
+    cache['bubble_coral'] = createBubbleCoral();
   }
 
-  // Draw kelp with natural staggered heights and wavy sine sway
+  // Draw kelp: thickened slightly with crisp definition and elegant leaves
   function drawPixelKelp(ctx, startX, startY, height, time, swayOffset = 0, isFront = false) {
-    const segments = Math.max(8, Math.floor(height / 14));
+    const segments = Math.max(8, Math.floor(height / 15));
     const segHeight = height / segments;
     let currX = startX;
     let currY = startY;
@@ -304,32 +392,53 @@ const PixelSprites = (() => {
     ctx.save();
     for (let i = 0; i < segments; i++) {
       // Gentle wavy sway
-      const sway = Math.sin(time * 1.5 + i * 0.32 + swayOffset) * (i * 2.5);
+      const sway = Math.sin(time * 1.4 + i * 0.3 + swayOffset) * (i * 2.4);
       const nextX = startX + sway;
       const nextY = currY - segHeight;
 
       const ratio = i / segments;
       let r, g, b;
       if (isFront) {
-        r = Math.round(18 + ratio * 45);
-        g = Math.round(160 + ratio * 85);
-        b = Math.round(65 + ratio * 45);
+        r = Math.round(18 + ratio * 42);
+        g = Math.round(162 + ratio * 80);
+        b = Math.round(62 + ratio * 42);
       } else {
-        r = Math.round(10 + ratio * 28);
-        g = Math.round(105 + ratio * 55);
-        b = Math.round(40 + ratio * 32);
+        r = Math.round(10 + ratio * 26);
+        g = Math.round(108 + ratio * 52);
+        b = Math.round(38 + ratio * 30);
       }
-      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
 
-      const bladeW = Math.max(5, 12 - i * 0.5);
+      // Slightly thickened blade (from 5-12 up to 8-16px)
+      const bladeW = Math.max(8, 16 - i * 0.55);
+
+      // Subtle dark outline for pixel depth
+      ctx.fillStyle = '#061a0c';
+      ctx.fillRect(Math.round(currX - bladeW / 2 - 1), Math.round(currY - segHeight), Math.round(bladeW + 2), Math.round(segHeight + 1));
+
+      // Main blade
+      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
       ctx.fillRect(Math.round(currX - bladeW / 2), Math.round(currY - segHeight), Math.round(bladeW), Math.round(segHeight + 1));
 
-      // Leaf fronds extending outward
+      // Center vein highlight
+      ctx.fillStyle = `rgb(${r + 26}, ${g + 30}, ${b + 16})`;
+      ctx.fillRect(Math.round(currX - 1), Math.round(currY - segHeight), 2, Math.round(segHeight + 1));
+
+      // Leaf fronds extending outward (thickened to 5px height and 12-18px wide)
       if (i % 2 === 0 && i > 1 && i < segments - 1) {
-        ctx.fillStyle = `rgb(${r + 25}, ${g + 30}, ${b + 15})`;
         const dir = (i % 4 === 0) ? 1 : -1;
-        const leafW = 9 + (segments - i) * 0.35;
-        ctx.fillRect(Math.round(currX + (dir === 1 ? bladeW / 2 : -bladeW / 2 - leafW)), Math.round(currY - segHeight / 2), Math.round(leafW), 4);
+        const leafW = 13 + (segments - i) * 0.5;
+        const leafH = 5;
+        const leafX = Math.round(currX + (dir === 1 ? bladeW / 2 : -bladeW / 2 - leafW));
+        const leafY = Math.round(currY - segHeight / 2 - leafH / 2);
+
+        ctx.fillStyle = '#061a0c';
+        ctx.fillRect(leafX - 1, leafY - 1, Math.round(leafW + 2), leafH + 2);
+
+        ctx.fillStyle = `rgb(${r + 20}, ${g + 26}, ${b + 12})`;
+        ctx.fillRect(leafX, leafY, Math.round(leafW), leafH);
+
+        ctx.fillStyle = `rgb(${r + 38}, ${g + 44}, ${b + 20})`;
+        ctx.fillRect(leafX, leafY, Math.round(leafW), 2);
       }
 
       currX = nextX;
