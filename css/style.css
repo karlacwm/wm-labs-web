@@ -83,9 +83,10 @@ html, body {
 }
 
 /* ==========================================================================
-   Navigation Bar (Header) - Clean, Minimalist & Focused
+   Navigation Bar (Header) - Brand Left, Menu Perfectly Centered
    ========================================================================== */
 .site-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -149,8 +150,11 @@ html, body {
   font-weight: 600;
 }
 
-/* Nav Menu */
+/* Nav Menu - Centered horizontally in the header */
 .nav-menu {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -170,7 +174,7 @@ html, body {
   font-family: var(--font-ui);
   font-size: 0.9rem;
   font-weight: 600;
-  padding: 0.45rem 1.2rem;
+  padding: 0.45rem 1.25rem;
   border-radius: 20px;
   cursor: pointer;
   transition: all var(--anim-fast);
@@ -360,8 +364,8 @@ html, body {
 }
 
 .product-avatar-preview {
-  width: 86px;
-  height: 86px;
+  width: 96px;
+  height: 72px;
   background: rgba(2, 6, 23, 0.6);
   border: 1.5px solid var(--drawer-accent, #38bdf8);
   border-radius: 10px;
@@ -373,7 +377,8 @@ html, body {
 
 .product-avatar-preview canvas {
   image-rendering: pixelated;
-  transform: scale(1.5);
+  max-width: 86px;
+  max-height: 58px;
 }
 
 .product-meta-block {
@@ -666,11 +671,13 @@ html, body {
 @media (max-width: 768px) {
   .site-header {
     padding: 1rem;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.75rem;
   }
 
   .nav-menu {
+    position: static;
+    transform: none;
     width: 100%;
     justify-content: space-around;
   }

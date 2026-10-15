@@ -1,9 +1,12 @@
 /**
- * WM LABS - Clean Aquarium Graphics & Simulation Engine
+ * WM LABS - Aquarium Simulation Engine
  * 
  * 60FPS HTML5 Canvas physics engine.
- * Features sleek, elongated pixel fish, extra-large vibrant coral reefs,
- * lush swaying kelp, large ambient background bubbles, and clean product hit-testing.
+ * Features:
+ * - Authentic pixel goldfish/koi gliding smoothly (static sprite, no wagging required)
+ * - Diverse scenery matching launchpad preview: slate rock mounds, tube sponges, pink anemone, staghorns
+ * - Varied-height swaying kelp forest (short, medium, and tall stalks)
+ * - Large ambient bubbles and clean hover inspection badge underneath each fish
  */
 
 class AquariumEngine {
@@ -22,7 +25,7 @@ class AquariumEngine {
     // Simulation entities
     this.fishList = [];
     this.bubbles = [];
-    this.bgBubbles = []; // Large cute background bubbles
+    this.bgBubbles = [];
     this.ambientMotes = [];
     this.kelpStalks = [];
     this.sceneryProps = [];
@@ -124,13 +127,32 @@ class AquariumEngine {
   }
 
   setupEnvironment() {
-    // 1. Lush, tall kelp stalks
+    // 1. Varied-height Kelp Stalks (staggered naturally, not uniform!)
     this.kelpStalks = [];
-    const stalkCount = Math.max(12, Math.floor(this.width / 75));
+    const stalkCount = Math.max(14, Math.floor(this.width / 65));
     for (let i = 0; i < stalkCount; i++) {
-      const isEdge = i < 4 || i > stalkCount - 5;
-      const x = (i / (stalkCount - 1)) * (this.width - 60) + 30 + (Math.random() * 26 - 13);
-      const height = isEdge ? 260 + Math.random() * 140 : 180 + Math.random() * 110;
+      const ratio = i / (stalkCount - 1);
+      const x = ratio * (this.width - 60) + 30 + (Math.random() * 20 - 10);
+
+      // Staggered height profile matching reference preview:
+      let height;
+      if (ratio < 0.22) {
+        // Far left: Tall lush forest reaching high up!
+        height = 360 + Math.random() * 90;
+      } else if (ratio >= 0.22 && ratio < 0.45) {
+        // Mid-left: Medium-short behind boulders
+        height = 150 + Math.random() * 80;
+      } else if (ratio >= 0.45 && ratio < 0.65) {
+        // Center: Low to mid-height tufts
+        height = 110 + Math.random() * 90;
+      } else if (ratio >= 0.65 && ratio < 0.85) {
+        // Mid-right: Medium stalks
+        height = 240 + Math.random() * 90;
+      } else {
+        // Far right: Tall stalks
+        height = 340 + Math.random() * 80;
+      }
+
       this.kelpStalks.push({
         x,
         baseY: this.height - 15,
@@ -140,26 +162,35 @@ class AquariumEngine {
       });
     }
 
-    // 2. Extra-large, abundant corals across the entire sea floor
+    // 2. Tiered, Staggered Rocks and Diverse Corals (Not a flat horizontal line!)
     this.sceneryProps = [
-      { type: 'coral_pink', x: this.width * 0.04, y: this.height - 90 },
-      { type: 'coral_fan_red', x: this.width * 0.16, y: this.height - 85 },
-      { type: 'coral_orange', x: this.width * 0.28, y: this.height - 88 },
-      { type: 'coral_cyan', x: this.width * 0.42, y: this.height - 86 },
-      { type: 'coral_yellow', x: this.width * 0.56, y: this.height - 85 },
-      { type: 'coral_fan_blue', x: this.width * 0.68, y: this.height - 85 },
-      { type: 'coral_emerald', x: this.width * 0.80, y: this.height - 86 },
-      { type: 'coral_purple', x: this.width * 0.91, y: this.height - 90 },
+      // Left Boulder Mound & Tube Sponges
+      { type: 'rock_mound', x: this.width * 0.03, y: this.height - 65 },
+      { type: 'tube_sponges', x: this.width * 0.07, y: this.height - 110 },
+      { type: 'pink_anemone', x: this.width * 0.16, y: this.height - 85 },
+
+      // Center-Left Sand Valley with Moss Mound & Cyan Staghorn
+      { type: 'moss_mound', x: this.width * 0.29, y: this.height - 48 },
+      { type: 'cyan_staghorn', x: this.width * 0.36, y: this.height - 95 },
+
+      // Center-Right Elevated Plateau with Red Sea Fan
+      { type: 'red_sea_fan', x: this.width * 0.52, y: this.height - 120 },
+      { type: 'moss_mound', x: this.width * 0.61, y: this.height - 52 },
+
+      // Right Tiered Reef Shelf with Rocks & Purple Tubes
+      { type: 'rock_mound', x: this.width * 0.72, y: this.height - 70 },
+      { type: 'purple_tubes', x: this.width * 0.81, y: this.height - 125 },
+      { type: 'cyan_staghorn', x: this.width * 0.90, y: this.height - 95 }
     ];
 
-    // 3. Large cute background bubbles
+    // 3. Cute large background bubbles
     this.bgBubbles = [];
     const bgBubbleCount = Math.max(16, Math.floor(this.width / 70));
     for (let i = 0; i < bgBubbleCount; i++) {
       this.bgBubbles.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
-        radius: 9 + Math.random() * 15, // 9px to 24px large glossy bubbles
+        radius: 9 + Math.random() * 15,
         vy: -0.4 - Math.random() * 0.5,
         wobble: Math.random() * Math.PI * 2,
         wobbleSpeed: 1.4 + Math.random() * 1.6,
@@ -167,7 +198,7 @@ class AquariumEngine {
       });
     }
 
-    // 4. Ambient floating light motes
+    // 4. Ambient light motes
     this.ambientMotes = [];
     for (let i = 0; i < 40; i++) {
       this.ambientMotes.push({
@@ -255,7 +286,7 @@ class AquariumEngine {
   }
 
   update(dt) {
-    // 1. Large background bubbles
+    // 1. Background bubbles
     this.bgBubbles.forEach(b => {
       b.wobble += dt * b.wobbleSpeed;
       b.x += Math.sin(b.wobble) * 0.6;
@@ -286,7 +317,7 @@ class AquariumEngine {
       if (m.x > this.width) m.x = 0;
     });
 
-    // 4. Fish
+    // 4. Fish gliding
     this.fishList.forEach(fish => fish.update(dt, this));
   }
 
@@ -297,7 +328,7 @@ class AquariumEngine {
     // 1. Water Background
     this.renderWaterBackground();
 
-    // 2. Sunlight Caustics
+    // 2. Sunlight Caustics Rays
     this.renderCaustics();
 
     // 3. Large Background Bubbles
@@ -308,15 +339,15 @@ class AquariumEngine {
     // 4. Ambient Motes
     this.renderAmbientMotes();
 
-    // 5. Background Kelp
+    // 5. Background Kelp (darker layer)
     this.kelpStalks.filter(k => !k.isFront).forEach(k => {
       PixelSprites.drawPixelKelp(ctx, k.x, k.baseY, k.height, this.timeSeconds, k.swayOffset, false);
     });
 
-    // 6. Sea Floor Substrate
+    // 6. Sandy Bottom Substrate
     this.renderSeaFloor();
 
-    // 7. Extra-Large Corals across the bottom
+    // 7. Scenery Rocks & Tiered Corals (Layered, Staggered)
     this.sceneryProps.forEach(prop => {
       const sprite = PixelSprites.getScenery(prop.type);
       if (sprite) {
@@ -324,12 +355,12 @@ class AquariumEngine {
       }
     });
 
-    // 8. Foreground Kelp
+    // 8. Foreground Kelp (vibrant green layer)
     this.kelpStalks.filter(k => k.isFront).forEach(k => {
       PixelSprites.drawPixelKelp(ctx, k.x, k.baseY, k.height, this.timeSeconds, k.swayOffset, true);
     });
 
-    // 9. Fish Entities (Longer, sleek, graceful)
+    // 9. Fish Entities (Gliding smoothly, static authentic pixel art)
     this.fishList.forEach(fish => fish.render(ctx));
 
     // 10. Foreground Bubbles
@@ -337,15 +368,14 @@ class AquariumEngine {
       PixelSprites.drawPixelBubble(ctx, b.x, b.y, b.radius, b.opacity);
     });
 
-    // 11. Top glass rim
+    // 11. Aquarium Rim & Glass Tank Outline
     this.renderAquariumRim();
   }
 
   renderWaterBackground() {
     const ctx = this.ctx;
     const grad = ctx.createLinearGradient(0, 0, 0, this.height);
-    // Deep crystal-clear tropical oceanic gradient
-    grad.addColorStop(0, '#1c74f0');
+    grad.addColorStop(0, '#1c78f2');
     grad.addColorStop(0.18, '#1056bd');
     grad.addColorStop(0.48, '#083e91');
     grad.addColorStop(0.82, '#052a6b');
@@ -368,7 +398,7 @@ class AquariumEngine {
       const widthBottom = 140 + Math.cos(t * 0.7 + i) * 45;
 
       const grad = ctx.createLinearGradient(0, 0, 0, this.height * 0.85);
-      grad.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
       grad.addColorStop(0.4, 'rgba(186, 230, 253, 0.07)');
       grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
@@ -418,7 +448,6 @@ class AquariumEngine {
     ctx.closePath();
     ctx.fill();
 
-    // Gravel flecks
     const fleckCount = Math.floor(this.width / 20);
     for (let i = 0; i < fleckCount; i++) {
       const fx = (i / fleckCount) * this.width + ((i * 37) % 20);
@@ -452,7 +481,8 @@ class AquariumEngine {
 
 /**
  * FishEntity represents an autonomous product fish.
- * Sleek, elongated body proportions with smooth swimming wag.
+ * Authentic goldfish/koi proportions matching the launch preview.
+ * Glides smoothly through water (tail does not move).
  */
 class FishEntity {
   constructor(product, x, y, engine) {
@@ -461,30 +491,26 @@ class FishEntity {
 
     this.x = x;
     this.y = y;
-    this.vx = (Math.random() > 0.5 ? 1 : -1) * (0.85 + Math.random() * 0.5);
+    this.vx = (Math.random() > 0.5 ? 1 : -1) * (0.8 + Math.random() * 0.5);
     this.vy = (Math.random() - 0.5) * 0.4;
     this.facing = this.vx >= 0 ? 1 : -1;
 
     this.targetX = this.x;
     this.targetY = this.y;
     this.pickNewWaypoint();
-    this.waypointTimer = 2 + Math.random() * 4;
+    this.waypointTimer = 3 + Math.random() * 5;
 
+    // Sprite is static (no tail wagging animation needed)
     this.frames = PixelSprites.getFrames(product.species);
-    this.currentFrame = 0;
-    this.animTimer = 0;
-    this.animSpeed = 0.16;
+    this.sprite = this.frames[0];
 
     this.isHovered = false;
     this.spinAngle = 0;
     this.isSpinning = false;
 
-    // Sleek scale: with 26x11 matrix, scale 3.6 yields ~94px long by 40px tall
-    this.scale = 3.6;
-    this.frameWidth = this.frames[0] ? this.frames[0].width : 52;
-    this.frameHeight = this.frames[0] ? this.frames[0].height : 22;
-    this.w = this.frameWidth * (this.scale / 2);
-    this.h = this.frameHeight * (this.scale / 2);
+    // Scale & Hit testing dimensions
+    this.w = this.sprite ? this.sprite.width : 90;
+    this.h = this.sprite ? this.sprite.height : 56;
 
     this.bubbleTimer = 2 + Math.random() * 5;
   }
@@ -492,7 +518,7 @@ class FishEntity {
   pickNewWaypoint() {
     const pad = 140;
     this.targetX = pad + Math.random() * (this.engine.width - pad * 2);
-    this.targetY = 120 + Math.random() * (this.engine.height - 220);
+    this.targetY = 120 + Math.random() * (this.engine.height - 240);
     this.waypointTimer = 4 + Math.random() * 6;
   }
 
@@ -505,8 +531,8 @@ class FishEntity {
   }
 
   containsPoint(px, py) {
-    const hitW = Math.max(this.w * 1.25, 100);
-    const hitH = Math.max(this.h * 1.5, 60);
+    const hitW = Math.max(this.w * 1.15, 95);
+    const hitH = Math.max(this.h * 1.25, 60);
     return (
       px >= this.x - hitW / 2 &&
       px <= this.x + hitW / 2 &&
@@ -516,12 +542,6 @@ class FishEntity {
   }
 
   update(dt, engine) {
-    this.animTimer += dt;
-    if (this.animTimer >= this.animSpeed) {
-      this.animTimer = 0;
-      this.currentFrame = (this.currentFrame + 1) % this.frames.length;
-    }
-
     if (this.isSpinning) {
       this.spinAngle += dt * 14;
       if (this.spinAngle >= Math.PI * 2) {
@@ -530,16 +550,16 @@ class FishEntity {
       }
     }
 
-    // Mouth bubbles (head is on the right when facing = 1)
+    // Gentle bubbles emitted from mouth (head on right when facing = 1)
     this.bubbleTimer -= dt;
     if (this.bubbleTimer <= 0) {
-      const mouthX = this.x + (this.facing === 1 ? this.w * 0.45 : -this.w * 0.45);
-      const mouthY = this.y;
+      const mouthX = this.x + (this.facing === 1 ? this.w * 0.44 : -this.w * 0.44);
+      const mouthY = this.y - 2;
       engine.spawnBubble(mouthX, mouthY, 2.5 + Math.random() * 2.5, 1.3);
       this.bubbleTimer = 4 + Math.random() * 7;
     }
 
-    // Gentle cursor curiosity
+    // Subtle cursor curiosity
     if (engine.mouse.inside && !this.isHovered) {
       const mouseDist = Math.hypot(engine.mouse.x - this.x, engine.mouse.y - this.y);
       if (mouseDist < 160) {
@@ -548,7 +568,6 @@ class FishEntity {
       }
     }
 
-    // Waypoint steering
     this.waypointTimer -= dt;
     if (this.waypointTimer <= 0) {
       this.pickNewWaypoint();
@@ -567,8 +586,9 @@ class FishEntity {
       this.vy += (targetVy - this.vy) * (dt * 1.5);
     }
 
+    // Smooth gliding with natural sinusoidal hydro-bob
     this.x += this.vx;
-    this.y += this.vy + Math.sin(engine.timeSeconds * 2.5 + this.x * 0.05) * 0.28;
+    this.y += this.vy + Math.sin(engine.timeSeconds * 2.2 + this.x * 0.04) * 0.28;
 
     if (this.vx > 0.08) this.facing = 1;
     else if (this.vx < -0.08) this.facing = -1;
@@ -576,7 +596,7 @@ class FishEntity {
     // Boundaries
     const padX = 85;
     const topPad = 110;
-    const bottomPad = engine.height - 90;
+    const bottomPad = engine.height - 110;
 
     if (this.x < padX) {
       this.x = padX;
@@ -600,8 +620,7 @@ class FishEntity {
   }
 
   render(ctx) {
-    const sprite = this.frames[this.currentFrame] || this.frames[0];
-    if (!sprite) return;
+    if (!this.sprite) return;
 
     ctx.save();
     ctx.translate(Math.round(this.x), Math.round(this.y));
@@ -617,14 +636,14 @@ class FishEntity {
       ctx.shadowBlur = 24;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
       ctx.beginPath();
-      ctx.ellipse(0, 0, this.w * 0.65, this.h * 0.65, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, this.w * 0.6, this.h * 0.6, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
 
-    // Render sleek fish (scale flips head appropriately when swimming left)
-    ctx.scale(this.facing * (this.scale / 2), (this.scale / 2));
-    ctx.drawImage(sprite, -sprite.width / 2, -sprite.height / 2);
+    // Facing right by default; flip horizontally when swimming left
+    ctx.scale(this.facing, 1);
+    ctx.drawImage(this.sprite, -this.w / 2, -this.h / 2);
 
     ctx.restore();
 
@@ -666,11 +685,11 @@ class FishEntity {
 
     // 2. "Click to inspect product →" position moved CLEARLY UNDER THE FISH
     if (isHovered) {
-      const hintY = Math.round(this.y + this.h / 2 + 18);
+      const hintY = Math.round(this.y + this.h / 2 + 20);
       ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
       const hintText = 'Click to inspect product →';
       const hintMetrics = ctx.measureText(hintText);
-      const hintW = hintMetrics.width + 20;
+      const hintW = hintMetrics.width + 22;
       const hintH = 24;
 
       const hx = Math.round(badgeX - hintW / 2);
