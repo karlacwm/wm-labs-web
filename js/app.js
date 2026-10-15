@@ -26,15 +26,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentProductIndex = 0;
 
-  // Initialize Aquarium Engine
-  const aquarium = new AquariumEngine(canvas, {
-    onFishClick: (product) => {
-      openProductModal(product);
-    }
-  });
+  let aquarium;
 
-  // Load registered products
-  aquarium.loadProducts(PRODUCTS_DATA);
+  function initApp() {
+    // Initialize Aquarium Engine
+    aquarium = new AquariumEngine(canvas, {
+      onFishClick: (product) => {
+        openProductModal(product);
+      }
+    });
+
+    // Load registered products
+    aquarium.loadProducts(PRODUCTS_DATA);
+  }
+
+  // Ensure custom pixel web fonts (Silkscreen, Press Start 2P) are fully loaded before rendering
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(initApp);
+  } else {
+    initApp();
+  }
 
   // Populate Products Directory Grid in Products Modal
   populateProductsGrid();

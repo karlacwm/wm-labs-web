@@ -686,19 +686,19 @@ class FishEntity {
     const isHovered = this.isHovered;
     const badgeX = Math.round(this.x);
 
-    // 1. Product Name Badge ON TOP of the fish (Enlarged for clear readability)
-    const nameY = Math.round(this.y - this.h / 2 - 20);
+    // 1. Product Name Badge ON TOP of the fish (Compact, razor-sharp Silkscreen Bold)
+    const nameY = Math.round(this.y - this.h / 2 - 18);
 
     ctx.save();
-    ctx.font = '700 15px "Pixelify Sans", "Plus Jakarta Sans", sans-serif';
+    ctx.font = '700 13px "Silkscreen", monospace';
     const text = this.product.name;
     const textMetrics = ctx.measureText(text);
-    const badgeW = Math.round(textMetrics.width + 34);
-    const badgeH = 28;
+    const badgeW = Math.round(textMetrics.width + 30);
+    const badgeH = 26;
 
-    const bgAlpha = isHovered ? 0.98 : 0.85;
-    ctx.fillStyle = 'rgba(8, 14, 28, ' + bgAlpha + ')';
-    ctx.strokeStyle = isHovered ? (this.product.accentColor || '#38BDF8') : 'rgba(255, 255, 255, 0.35)';
+    const bgAlpha = isHovered ? 0.98 : 0.88;
+    ctx.fillStyle = 'rgba(6, 11, 24, ' + bgAlpha + ')';
+    ctx.strokeStyle = isHovered ? (this.product.accentColor || '#38BDF8') : 'rgba(255, 255, 255, 0.40)';
     ctx.lineWidth = isHovered ? 2 : 1.5;
 
     const rx = Math.round(badgeX - badgeW / 2);
@@ -709,7 +709,7 @@ class FishEntity {
 
     // Accent indicator dot/square
     ctx.fillStyle = this.product.accentColor || '#38BDF8';
-    ctx.fillRect(rx + 8, ry + 9, 10, 10);
+    ctx.fillRect(rx + 8, ry + 8, 10, 10);
 
     ctx.fillStyle = isHovered ? '#FFFFFF' : '#F1F5F9';
     ctx.textAlign = 'left';
@@ -718,18 +718,18 @@ class FishEntity {
 
     // 2. "Click to inspect product →" position moved CLEARLY UNDER THE FISH
     if (isHovered) {
-      const hintY = Math.round(this.y + this.h / 2 + 22);
-      ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+      const hintY = Math.round(this.y + this.h / 2 + 20);
+      ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
       const hintText = 'Click to inspect product →';
       const hintMetrics = ctx.measureText(hintText);
-      const hintW = hintMetrics.width + 24;
-      const hintH = 26;
+      const hintW = hintMetrics.width + 22;
+      const hintH = 24;
 
       const hx = Math.round(badgeX - hintW / 2);
       const hy = Math.round(hintY - hintH / 2);
 
       // High-contrast dark badge for 100% crisp readability
-      ctx.fillStyle = 'rgba(6, 11, 25, 0.96)';
+      ctx.fillStyle = 'rgba(6, 11, 24, 0.96)';
       ctx.fillRect(hx, hy, hintW, hintH);
 
       ctx.strokeStyle = this.product.accentColor || '#38BDF8';

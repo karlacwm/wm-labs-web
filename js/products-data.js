@@ -10,7 +10,7 @@ const PRODUCTS_DATA = [
     id: 'goalcoach',
     name: 'GoalCoach',
     tagline: 'Adaptive AI Language Coach for Goal-Oriented Learners',
-    category: 'AI & Education',
+    category: 'AI + Education',
     status: 'Live MVP',
     releaseEta: 'Available Now',
     leadDev: 'WM Labs AI Education Group',
