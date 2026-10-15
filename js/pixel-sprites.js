@@ -1,9 +1,8 @@
 /**
  * WM LABS - Pixel Graphics Art & Sprite Generator
  * 
- * Provides procedural pixel art rendering for cute clean fish species,
- * large environmental corals, lush waving kelp, and shiny bubble particles.
- * Supports both matrix-based pixel art and external PNG sprite loading.
+ * Provides procedural pixel art rendering for sleek, longer fish species,
+ * extra-large environmental corals, lush waving kelp, and shiny bubble particles.
  */
 
 const PixelSprites = (() => {
@@ -35,100 +34,98 @@ const PixelSprites = (() => {
     return canvas;
   }
 
-  // --- CUTE, SIMPLE, ICONIC PIXEL FISH FRAMES (Facing RIGHT: Head right, Tail left) ---
+  // --- SLEEK, LONGER, ELEGANT PIXEL FISH (26x11, ratio ~ 2.4:1) ---
+  // Facing RIGHT: Head on the right, fan tail on the left
+
   // Frame 0: Neutral Tail
   const fishFrame0 = [
-    ".........KKKK.......",
-    ".......KKHHHHcKK....",
-    "..KKKKKCHHHHHHHcK...",
-    ".KFFFFKCCHHHHHHHcK..",
-    "KFFFFFKCCCHHHHWWEcK.",
-    "KFFFFFFKCCCCCWGGECK.",
-    "KFFFFFKCCFFCCWGGECK.",
-    ".KFFFFKCCffffCCCCcK.",
-    "..KKKKKCBCCCCCCccK..",
-    ".......KCBBBBBBcK...",
-    "........KKBBBBcK....",
-    "..........KKKK......"
+    "..............KKKKKK......",
+    "............KKHHHHHcKK....",
+    "...KKKKKKKKKCHHHHHHHHcK...",
+    ".KKFFFFFFFKKCCHHHHHHHHcK..",
+    "KFFFFFFFFFKCCCHHHHHHHWWEcK",
+    "KFFFFFFFFFKCCCCCCCCCCWGGcK",
+    "KFFFFFFFFFKCCFFCCCCCCCccK.",
+    ".KKFFFFFFFKKCffffCCCCCCCK.",
+    "...KKKKKKKKKCBBBBBBBBBBcK.",
+    "............KKBBBBBBBBcK..",
+    "..............KKKKKKKK...."
   ];
 
   // Frame 1: Tail swung UP
   const fishFrame1 = [
-    ".KKKKKKKK...........",
-    "KFFFFFFKKKHHHHcKK...",
-    "KFFFFFFFKCHHHHHHHcK.",
-    ".KFFFFFKCCHHHHHHHcK.",
-    "..KKKKKKCCCHHHHWWEcK",
-    "......KCCCCCCWGGECK.",
-    "......KCCFFCCWGGECK.",
-    "......KCCffffCCCCcK.",
-    ".......KCBCCCCCCccK.",
-    ".......KCBBBBBBcK...",
-    "........KKBBBBcK....",
-    "..........KKKK......"
+    ".KKKKKKKKK................",
+    "KFFFFFFFFFKK..KKKKKK......",
+    "KFFFFFFFFFFKKKHHHHHcKK....",
+    ".KKFFFFFFFKKCCHHHHHHHHcK..",
+    "..KKKKKKKKKCCCHHHHHHHWWEcK",
+    "..........KCCCCCCCCCCWGGcK",
+    "..........KCCFFCCCCCCCccK.",
+    "..........KCffffCCCCCCCK..",
+    "..........KCBBBBBBBBBBcK..",
+    "...........KKBBBBBBBBcK...",
+    ".............KKKKKKKK....."
   ];
 
   // Frame 2: Tail swung DOWN
   const fishFrame2 = [
-    ".........KKKK.......",
-    ".......KKHHHHcKK....",
-    "........KCHHHHHHHcK.",
-    ".......KCCHHHHHHHcK.",
-    "......KCCCHHHHWWEcK.",
-    "......KCCCCCCWGGECK.",
-    "..KKKKKCCFFCCWGGECK.",
-    ".KFFFFFKCffffCCCCcK.",
-    "KFFFFFFKCBCCCCCCccK.",
-    "KFFFFFFKKCBBBBBBcK..",
-    ".KKKKKK.KKBBBBcK....",
-    "..........KKKK......"
+    "..............KKKKKK......",
+    "............KKHHHHHcKK....",
+    "............KCHHHHHHHHcK..",
+    "...........KCCHHHHHHHHcK..",
+    "..........KCCCHHHHHHHWWEcK",
+    "..........KCCCCCCCCCCWGGcK",
+    "..KKKKKKKKKCCFFCCCCCCCccK.",
+    ".KKFFFFFFFKKCffffCCCCCCCK.",
+    "KFFFFFFFFFKCBBBBBBBBBBcK..",
+    "KFFFFFFFFFFKKBBBBBBBBcK...",
+    ".KKKKKKKKK...KKKKKKKK....."
   ];
 
   const fishFrames = [fishFrame0, fishFrame1, fishFrame2];
 
-  // Color palettes for simple, distinct, vibrant fish
+  // 6 distinct vibrant colorways
   const colorPalettes = {
-    // 1. Orange Clown/Goldfish (AquaOS)
+    // 1. Vibrant Tangerine Orange (AquaOS)
     clownfish: {
       C: '#FF7A29', c: '#D94B0A', H: '#FFA966', B: '#FFF0D4', F: '#FF944D', f: '#C43D04',
       W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
     },
-    // 2. Cyan / Neon Blue Tang (HyperStream)
+    // 2. Electric Cyan / Neon Blue (HyperStream)
     neontetra: {
       C: '#00D2FF', c: '#007BB8', H: '#80E8FF', B: '#E0F7FF', F: '#38BDF8', f: '#0284C7',
       W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
     },
-    // 3. Mint / Emerald Angelfish (DeepQuery)
+    // 3. Mint / Emerald Jade Green (DeepQuery)
     angelfish: {
       C: '#10B981', c: '#047857', H: '#6EE7B7', B: '#ECFDF5', F: '#34D399', f: '#059669',
       W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
     },
-    // 4. Golden Yellow Sunfish (VaultPulse)
+    // 4. Radiant Golden Amber Sunfish (VaultPulse)
     pufferfish: {
       C: '#FBBF24', c: '#D97706', H: '#FDE68A', B: '#FFFBEB', F: '#FCD34D', f: '#B45309',
       W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
     },
-    // 5. Coral / Ruby Koi (Aura Compute)
+    // 5. Coral / Ruby Rose (Aura Compute)
     koi: {
       C: '#F43F5E', c: '#BE123C', H: '#FDA4AF', B: '#FFF1F2', F: '#FB7185', f: '#9F1239',
       W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
     },
-    // 6. Royal Purple / Violet Guppy (PixelForge UI)
+    // 6. Royal Cyber Violet (PixelForge UI)
     guppy: {
       C: '#A855F7', c: '#7E22CE', H: '#D8B4FE', B: '#FAF5FF', F: '#C084FC', f: '#6B21A8',
       W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
     }
   };
 
-  // --- LARGER, MORE VIBRANT CORAL SPRITES ---
-  function createBigCoralSprite(primaryColor, darkColor, highlightColor) {
+  // --- EXTRA LARGE, DIVERSE CORAL SPRITES (pixelScale = 4 for impressive size) ---
+  function createBranchingCoral(primaryColor, darkColor, highlightColor) {
     const palette = {
       'C': primaryColor,
       'c': darkColor,
       'H': highlightColor,
       'K': '#090D16'
     };
-    // 24x18 larger branching coral
     const m = [
       "....KK.......KK.........KK..",
       "...KCCK.....KCCK.......KCCK.",
@@ -148,11 +145,10 @@ const PixelSprites = (() => {
       ".........KKccccccccKK.......",
       "...........KKKKKKKK........."
     ];
-    return createMatrixSprite(m, palette, 3);
+    return createMatrixSprite(m, palette, 4); // 4x scale for large size!
   }
 
-  // Round Brain Coral / Sea Anemone
-  function createBrainCoralSprite(c1, c2, c3) {
+  function createAnemoneCoral(c1, c2, c3) {
     const palette = { 'A': c1, 'B': c2, 'C': c3, 'K': '#090D16' };
     const m = [
       "........KKKKKKKK........",
@@ -172,73 +168,56 @@ const PixelSprites = (() => {
       "...KKBBBBBBBBBBBBKK.....",
       ".....KKKKKKKKKKKK......."
     ];
-    return createMatrixSprite(m, palette, 3);
+    return createMatrixSprite(m, palette, 4); // 4x scale!
   }
 
-  // Chest Sprite
-  function createChestSprite() {
+  function createFanCoral(primaryColor, darkColor, lightColor) {
     const palette = {
-      'W': '#78350F',
-      'w': '#B45309',
-      'G': '#FBBF24',
-      'g': '#D97706',
-      'K': '#090D16',
-      'L': '#38BDF8',
-      'l': '#BAE6FD',
+      'C': primaryColor,
+      'c': darkColor,
+      'L': lightColor,
+      'K': '#090D16'
     };
     const m = [
-      ".......KKKKKKKKKKKKKK.......",
-      ".....KKGGGGGGGGGGGGGGKK.....",
-      "....KGWwWwWwWwWwWwWwWGK.....",
-      "...KGwWwWwWwWwWwWwWwWwWGK...",
-      "...KGGGGGGGGGGGGGGGGGGGGK...",
-      "...KLLLLLLLLLLLLLLLLLLLLK...",
-      "...KLLllllLLLLllllLLLLLLK...",
-      "..KGGGGGGGGGGGGGGGGGGGGGGK..",
-      "..KGWWwwWWwwWWwwWWwwWWwwGK..",
-      "..KGWwWWwwWWwwWWwwWWwwWWGK..",
-      "..KGWwWWwwWGgGWwwWWwwWWwGK..",
-      "..KGWWwwWWwGgGWwwWWwwWWwGK..",
-      "..KGWwWWwwWWwwWWwwWWwwWWGK..",
-      "..KGWWwwWWwwWWwwWWwwWWwwGK..",
-      "..KKGGGGGGGGGGGGGGGGGGGGKK..",
-      "....KKKKKKKKKKKKKKKKKKKK...."
+      ".......KKKKKKKKKK.......",
+      ".....KKLLLLLLLLLLKK.....",
+      "...KKLLCCCCCCCCCCLLKK...",
+      "..KLLCCCCCCCCCCCCCCLLK..",
+      ".KLLCCKcKKcKKcKKcKCCLLK.",
+      ".KLCcKKcKKcKKcKKcKKcCLK.",
+      "KLLCCKKcKKcKKcKKcKKCCLLK",
+      "KLCCCCCCCCCCCCCCCCCCCCLK",
+      "KLCCcKcKcKcKcKcKcKcKCcLK",
+      ".KCCcKcKcKcKcKcKcKcKCcK.",
+      "..KCccKccKccKccKccKccK..",
+      "...KccccccccccccccccK...",
+      ".....KKKccccccccKKK.....",
+      "........KKccccKK........",
+      "..........KccK..........",
+      "..........KKKK.........."
     ];
-    return createMatrixSprite(m, palette, 3);
+    return createMatrixSprite(m, palette, 4); // 4x scale!
   }
 
   function initSprites() {
-    // Generate clean fish species in each colorway
+    // Build sleek fish sprites
     Object.keys(colorPalettes).forEach(species => {
       const palette = colorPalettes[species];
       cache[species] = fishFrames.map(m => createMatrixSprite(m, palette, 2));
     });
 
-    // Rich Coral Formations
-    cache['coral_pink'] = createBigCoralSprite('#F43F5E', '#BE123C', '#FDA4AF');
-    cache['coral_purple'] = createBigCoralSprite('#A855F7', '#7E22CE', '#E9D5FF');
-    cache['coral_orange'] = createBigCoralSprite('#FB923C', '#C2410C', '#FED7AA');
-    cache['coral_cyan'] = createBrainCoralSprite('#06B6D4', '#0E7490', '#A5F3FC');
-    cache['coral_yellow'] = createBrainCoralSprite('#EAB308', '#A16207', '#FEF08A');
-
-    cache['chest'] = createChestSprite();
+    // Build large, diverse coral reefs
+    cache['coral_pink'] = createBranchingCoral('#F43F5E', '#BE123C', '#FDA4AF');
+    cache['coral_purple'] = createBranchingCoral('#A855F7', '#7E22CE', '#E9D5FF');
+    cache['coral_orange'] = createBranchingCoral('#FB923C', '#C2410C', '#FED7AA');
+    cache['coral_cyan'] = createAnemoneCoral('#06B6D4', '#0E7490', '#A5F3FC');
+    cache['coral_yellow'] = createAnemoneCoral('#EAB308', '#A16207', '#FEF08A');
+    cache['coral_fan_red'] = createFanCoral('#EF4444', '#991B1B', '#FCA5A5');
+    cache['coral_fan_blue'] = createFanCoral('#3B82F6', '#1E40AF', '#93C5FD');
+    cache['coral_emerald'] = createAnemoneCoral('#10B981', '#047857', '#6EE7B7');
   }
 
-  /**
-   * Helper to load external PNG image sprites if user wishes to import custom drawn art.
-   * Handles onload asynchronous events safely so nothing breaks or remains invisible.
-   */
-  function loadSpriteImage(url) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => resolve(img);
-      img.onerror = (err) => reject(err);
-      img.src = url;
-    });
-  }
-
-  // Draw lush, taller, thicker seaweed with sine wave sway
+  // Draw lush, taller kelp with dynamic sinusoidal sway
   function drawPixelKelp(ctx, startX, startY, height, time, swayOffset = 0, isFront = false) {
     const segments = Math.floor(height / 12);
     const segHeight = height / segments;
@@ -247,12 +226,10 @@ const PixelSprites = (() => {
 
     ctx.save();
     for (let i = 0; i < segments; i++) {
-      // Gentle sinusoidal wave sway
       const sway = Math.sin(time * 1.6 + i * 0.35 + swayOffset) * (i * 2.8);
       const nextX = startX + sway;
       const nextY = currY - segHeight;
 
-      // Color shading
       const ratio = i / segments;
       let r, g, b;
       if (isFront) {
@@ -266,11 +243,9 @@ const PixelSprites = (() => {
       }
       ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
 
-      // Thicker blade width
       const bladeW = Math.max(6, 14 - i * 0.6);
       ctx.fillRect(Math.round(currX - bladeW / 2), Math.round(currY - segHeight), Math.round(bladeW), Math.round(segHeight + 1));
 
-      // Leaf fronds extending outward
       if (i % 2 === 0 && i > 1 && i < segments - 1) {
         ctx.fillStyle = `rgb(${r + 25}, ${g + 30}, ${b + 15})`;
         const dir = (i % 4 === 0) ? 1 : -1;
@@ -284,27 +259,23 @@ const PixelSprites = (() => {
     ctx.restore();
   }
 
-  // Draw cute glossy pixel bubble of any size
+  // Draw cute glossy pixel bubble
   function drawPixelBubble(ctx, x, y, radius, opacity = 0.85) {
     ctx.save();
     ctx.globalAlpha = opacity;
     const r = Math.max(3, Math.round(radius));
 
-    // Outer pixel ring
     ctx.fillStyle = '#BAE6FD';
     ctx.fillRect(Math.round(x - r + 1), Math.round(y - r), (r - 1) * 2, r * 2);
     ctx.fillRect(Math.round(x - r), Math.round(y - r + 1), r * 2, (r - 1) * 2);
 
-    // Inner translucent sphere
     ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.fillRect(Math.round(x - r + 2), Math.round(y - r + 2), (r - 2) * 2, (r - 2) * 2);
 
-    // Cute glossy highlight pixel
     ctx.fillStyle = '#FFFFFF';
     const hlSize = Math.max(2, Math.floor(r * 0.45));
     ctx.fillRect(Math.round(x - Math.floor(r * 0.55)), Math.round(y - Math.floor(r * 0.55)), hlSize, hlSize);
 
-    // Secondary subtle lower glint for big bubbles
     if (r >= 8) {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.fillRect(Math.round(x + Math.floor(r * 0.3)), Math.round(y + Math.floor(r * 0.3)), 2, 2);
@@ -313,24 +284,12 @@ const PixelSprites = (() => {
     ctx.restore();
   }
 
-  // Draw food pellet
-  function drawPixelFlake(ctx, x, y, frame) {
-    ctx.save();
-    ctx.fillStyle = (frame % 2 === 0) ? '#F59E0B' : '#EF4444';
-    ctx.fillRect(Math.round(x), Math.round(y), 5, 4);
-    ctx.fillStyle = '#FDE68A';
-    ctx.fillRect(Math.round(x + 1), Math.round(y + 1), 3, 2);
-    ctx.restore();
-  }
-
   return {
     init: initSprites,
     getFrames: (species) => cache[species] || cache['clownfish'],
     getScenery: (key) => cache[key],
     drawPixelKelp,
-    drawPixelBubble,
-    drawPixelFlake,
-    loadSpriteImage
+    drawPixelBubble
   };
 })();
 

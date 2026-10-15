@@ -1,18 +1,12 @@
 /**
  * WM LABS - Interactive Aquarium Application Controller
  * 
- * Coordinates UI states, modal dialogues, product drawers, audio toggles,
- * lighting filters, and connects the DOM to the Canvas AquariumEngine.
+ * Clean, streamlined UI controller coordinating navigation links,
+ * the active Products directory, About Us, Contact modal, and the Product Dossier drawer.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Elements
   const canvas = document.getElementById('aquarium-canvas');
-  const feedBtn = document.getElementById('btn-feed');
-  const themeToggleBtn = document.getElementById('btn-theme-toggle');
-  const soundToggleBtn = document.getElementById('btn-sound-toggle');
-  const quickChipsContainer = document.getElementById('quick-chips-container');
-  const tankCountEl = document.getElementById('tank-product-count');
 
   // Modals & Drawers
   const productDrawerOverlay = document.getElementById('product-drawer-overlay');
@@ -23,14 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const productsModal = document.getElementById('modal-products');
   const aboutModal = document.getElementById('modal-about');
   const contactModal = document.getElementById('modal-contact');
-  const devGuideModal = document.getElementById('modal-dev-guide');
 
   // Nav buttons
   const navHomeBtn = document.getElementById('nav-home');
   const navProductsBtn = document.getElementById('nav-products');
   const navAboutBtn = document.getElementById('nav-about');
   const navContactBtn = document.getElementById('nav-contact');
-  const devPillBtn = document.getElementById('dev-helper-pill');
 
   let currentProductIndex = 0;
 
@@ -38,20 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const aquarium = new AquariumEngine(canvas, {
     onFishClick: (product) => {
       openProductDrawer(product);
-    },
-    onFishHover: (product) => {
-      // Hover feedback handled in canvas and badge
     }
   });
 
   // Load registered products
   aquarium.loadProducts(PRODUCTS_DATA);
-  if (tankCountEl) {
-    tankCountEl.textContent = `${PRODUCTS_DATA.length} Products Swimming`;
-  }
-
-  // Populate Quick Select Chips in bottom status bar
-  populateQuickChips();
 
   // Populate Products Directory Grid in Products Modal
   populateProductsGrid();
@@ -156,26 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================================================
-  // Quick Chips in Footer
-  // ==========================================================================
-  function populateQuickChips() {
-    quickChipsContainer.innerHTML = '';
-    PRODUCTS_DATA.forEach(prod => {
-      const chip = document.createElement('button');
-      chip.className = 'fish-quick-chip interactive';
-      chip.innerHTML = `
-        <span class="chip-pip" style="background-color: ${prod.accentColor}"></span>
-        <span>${prod.name}</span>
-      `;
-      chip.addEventListener('click', (e) => {
-        e.stopPropagation();
-        aquarium.focusProduct(prod.id);
-      });
-      quickChipsContainer.appendChild(chip);
-    });
-  }
-
-  // ==========================================================================
   // Products Directory Grid Modal
   // ==========================================================================
   function populateProductsGrid() {
@@ -224,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
     navHomeBtn.classList.add('active');
   }
 
-  // Hook close buttons on all modals
   document.querySelectorAll('.modal-close-btn').forEach(btn => {
     btn.addEventListener('click', closeAllModals);
   });
@@ -237,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Nav Links
+  // Navigation Links
   navHomeBtn.addEventListener('click', () => {
     closeAllModals();
     closeProductDrawer();
@@ -259,37 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     navContactBtn.classList.add('active');
   });
 
-  if (devPillBtn) {
-    devPillBtn.addEventListener('click', () => {
-      openModal(devGuideModal);
-    });
-  }
-
-  // ==========================================================================
-  // Header Actions (Feed, Lighting, Audio)
-  // ==========================================================================
-  feedBtn.addEventListener('click', () => {
-    const x = window.innerWidth * (0.2 + Math.random() * 0.6);
-    const y = 80 + Math.random() * 50;
-    aquarium.spawnFood(x, y, 6);
-    SoundFX.playBubble();
-  });
-
-  themeToggleBtn.addEventListener('click', () => {
-    const isNight = aquarium.toggleNightMode();
-    themeToggleBtn.innerHTML = isNight
-      ? `<span>🌙</span> Deep Sea`
-      : `<span>☀️</span> Sunlit Reef`;
-  });
-
-  soundToggleBtn.addEventListener('click', () => {
-    const isAudioOn = SoundFX.toggleMute();
-    soundToggleBtn.innerHTML = isAudioOn
-      ? `<span>🔊</span> Sound ON`
-      : `<span>🔇</span> Sound OFF`;
-  });
-
-  // Contact form submission placeholder
+  // Contact form submission
   const contactForm = document.getElementById('contact-form');
   if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
@@ -305,9 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       closeAllModals();
       closeProductDrawer();
-    } else if (e.key === 'f' || e.key === 'F') {
-      // Shortcut to feed fish
-      feedBtn.click();
     }
   });
 });
