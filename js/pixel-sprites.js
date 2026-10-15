@@ -1,20 +1,18 @@
 /**
  * WM LABS - Pixel Graphics Art & Sprite Generator
  * 
- * Provides procedural and matrix-based pixel art rendering for fish species,
- * environmental flora, rocks, shells, and underwater particle effects.
+ * Provides procedural pixel art rendering for cute clean fish species,
+ * large environmental corals, lush waving kelp, and shiny bubble particles.
+ * Supports both matrix-based pixel art and external PNG sprite loading.
  */
 
 const PixelSprites = (() => {
-  // Offscreen canvas cache for blazing fast 60fps renders
   const cache = {};
 
   /**
    * Helper to parse pixel art matrix into an offscreen canvas.
-   * `palette`: map of characters to hex/rgba strings (' ' or '.' = transparent)
-   * `matrix`: array of equal-length strings
    */
-  function createMatrixSprite(matrix, palette, pixelScale = 1) {
+  function createMatrixSprite(matrix, palette, pixelScale = 2) {
     const height = matrix.length;
     const width = matrix[0].length;
     const canvas = document.createElement('canvas');
@@ -37,429 +35,155 @@ const PixelSprites = (() => {
     return canvas;
   }
 
-  // --- 1. CLOWNFISH SPRITES (3 animation frames for tail wag) ---
-  const clownfishPalette = {
-    'O': '#FF6B35', // Primary bright orange
-    'o': '#D94D1A', // Dark orange shadow
-    'W': '#FFFFFF', // Crisp white band
-    'w': '#E0E6ED', // White shadow
-    'K': '#1A1E24', // Black outline & fin accents
-    'Y': '#FFB03B', // Highlight orange
-    'E': '#0E1726', // Eye pupil
-    'G': '#4FD1C5', // Eye sparkle
-    'F': '#FFA552', // Fin membrane
-    'f': '#C9551E', // Fin rib
-  };
-
-  const clownfishFrames = [
-    // Frame 0: Tail straight
-    [
-      "............KKKK............",
-      "..........KKOOOOKK..........",
-      ".........KOOOYYOOOK.........",
-      "........KOOGEEYYOOOK........",
-      ".......KOOGEEEYYOOOOK.......",
-      "......KOOYYOYYYYOOOOOK......",
-      ".....KOOYYYWWWWYOOOOOK......",
-      "....KOOYYYWWWwwKOOOOOK......",
-      "...KOOYYYWWWwwwKKOOOOOOK....",
-      "..KKOOYYYWWWwwwKKKOOOOOKK...",
-      ".KFFKOYYWWWWwwwKKKOOOOOFFK..",
-      "KFFFFKYYWWWWwwKKKOOOOOFFFFK.",
-      ".KFFfKOYYWWWwwKKOOOOOOfffK..",
-      "..KKOOOOOOOOOOKKOOOWWKOOK...",
-      "...KOOOOOOOOOOKKOOWWWwK.....",
-      "....KOOOOOOOOKKKOOWWwwK.....",
-      ".....KOOOOOOKKKKOOWWWwK.....",
-      "......KKKKKK..KKOOWWWwK.....",
-      "...............KKOOWWwK.....",
-      "................KKKKKK......"
-    ],
-    // Frame 1: Tail swung up
-    [
-      "............KKKK............",
-      "..........KKOOOOKK...KKKK...",
-      ".........KOOOYYOOOK.KOFFK...",
-      "........KOOGEEYYOOOKKOFFFK..",
-      ".......KOOGEEEYYOOOKOFFFFK..",
-      "......KOOYYOYYYYOOOOOFFfK...",
-      ".....KOOYYYWWWWYOOOOOFFK....",
-      "....KOOYYYWWWwwKOOOOOOK.....",
-      "...KOOYYYWWWwwwKKOOOOOOK....",
-      "..KKOOYYYWWWwwwKKKOOOOOKK...",
-      ".KFFKOYYWWWWwwwKKKOOOOOOKK..",
-      "KFFFFKYYWWWWwwKKKOOOOOOOK...",
-      ".KFFfKOYYWWWwwKKOOOOOOOK....",
-      "..KKOOOOOOOOOOKKOOOWWKK.....",
-      "...KOOOOOOOOOOKKOOWWWwK.....",
-      "....KOOOOOOOOKKKOOWWwwK.....",
-      ".....KOOOOOOKKKKOOWWWwK.....",
-      "......KKKKKK..KKOOWWWwK.....",
-      "...............KKOOWWwK.....",
-      "................KKKKKK......"
-    ],
-    // Frame 2: Tail swung down
-    [
-      "............KKKK............",
-      "..........KKOOOOKK..........",
-      ".........KOOOYYOOOK.........",
-      "........KOOGEEYYOOOK........",
-      ".......KOOGEEEYYOOOOK.......",
-      "......KOOYYOYYYYOOOOOK......",
-      ".....KOOYYYWWWWYOOOOOK......",
-      "....KOOYYYWWWwwKOOOOOK......",
-      "...KOOYYYWWWwwwKKOOOOOOK....",
-      "..KKOOYYYWWWwwwKKKOOOOOKK...",
-      ".KFFKOYYWWWWwwwKKKOOOOOKK...",
-      "KFFFFKYYWWWWwwKKKOOOOOOOK...",
-      ".KFFfKOYYWWWwwKKOOOOOOOFFK..",
-      "..KKOOOOOOOOOOKKOOOWWKOOFFFK",
-      "...KOOOOOOOOOOKKOOWWWwKOFFFK",
-      "....KOOOOOOOOKKKOOWWwwKKOFFK",
-      ".....KOOOOOOKKKKOOWWWwKKKKK.",
-      "......KKKKKK..KKOOWWWwK.....",
-      "...............KKOOWWwK.....",
-      "................KKKKKK......"
-    ]
+  // --- CUTE, SIMPLE, ICONIC PIXEL FISH FRAMES (Facing RIGHT: Head right, Tail left) ---
+  // Frame 0: Neutral Tail
+  const fishFrame0 = [
+    ".........KKKK.......",
+    ".......KKHHHHcKK....",
+    "..KKKKKCHHHHHHHcK...",
+    ".KFFFFKCCHHHHHHHcK..",
+    "KFFFFFKCCCHHHHWWEcK.",
+    "KFFFFFFKCCCCCWGGECK.",
+    "KFFFFFKCCFFCCWGGECK.",
+    ".KFFFFKCCffffCCCCcK.",
+    "..KKKKKCBCCCCCCccK..",
+    ".......KCBBBBBBcK...",
+    "........KKBBBBcK....",
+    "..........KKKK......"
   ];
 
-  // --- 2. NEON TETRA (Electric Blue & Ruby Red Glow) ---
-  const neonPalette = {
-    'B': '#00F2FE', // Neon Cyan / Turquoise glow
-    'b': '#009FFD', // Deep Neon Blue
-    'R': '#FF0844', // Hot Ruby Red
-    'r': '#B5072F', // Deep Ruby
-    'S': '#E2E8F0', // Silver Belly
-    's': '#94A3B8', // Shadow Silver
-    'K': '#0A1128', // Dark Outline
-    'E': '#001020', // Pupil
-    'G': '#A5F3FC', // Glint
-    'F': '#38BDF8', // Translucent Fin
-  };
-
-  const neonFrames = [
-    // Frame 0: straight
-    [
-      ".........KKKKKK.............",
-      ".......KKBBBBBBKK...........",
-      "......KBGBBBBBBBBKK.........",
-      ".....KBGEBBBBBBBBBBKK.......",
-      "....KBBBBBBBBBBBBBBBBKK.....",
-      "...KBbBBBBBBBBBBBBBBBBBK....",
-      "..KBbbBBBBBBBBBBbbbbbbbbKK..",
-      ".KSSbbbbbbbbbbbbRRRRRRRRRKK.",
-      "KSSSSSSsssssssRRRRRRRRRRRRKK",
-      ".KSSSSSSSSsssRRRRRRRRRRRFFF.",
-      "..KKSSSSSSssRRRRRRRRRRRFFFFK",
-      "....KKKSSSSSRRRRRRRRRRFFFFK.",
-      ".......KKKKKRRRRRRRRKKKK....",
-      "............KKKKKKKK........"
-    ],
-    // Frame 1: tail flutter up
-    [
-      ".........KKKKKK.....KKKK....",
-      ".......KKBBBBBBKK..KFFFFK...",
-      "......KBGBBBBBBBBKK.KFFFK...",
-      ".....KBGEBBBBBBBBBBKKKFK....",
-      "....KBBBBBBBBBBBBBBBBKKK....",
-      "...KBbBBBBBBBBBBBBBBBBBK....",
-      "..KBbbBBBBBBBBBBbbbbbbbbKK..",
-      ".KSSbbbbbbbbbbbbRRRRRRRRRKK.",
-      "KSSSSSSsssssssRRRRRRRRRRRRKK",
-      ".KSSSSSSSSsssRRRRRRRRRRKK...",
-      "..KKSSSSSSssRRRRRRRRRKK.....",
-      "....KKKSSSSSRRRRRRRKK.......",
-      ".......KKKKKRRRRRRK.........",
-      "............KKKKKK.........."
-    ],
-    // Frame 2: tail flutter down
-    [
-      ".........KKKKKK.............",
-      ".......KKBBBBBBKK...........",
-      "......KBGBBBBBBBBKK.........",
-      ".....KBGEBBBBBBBBBBKK.......",
-      "....KBBBBBBBBBBBBBBBBKK.....",
-      "...KBbBBBBBBBBBBBBBBBBBK....",
-      "..KBbbBBBBBBBBBBbbbbbbbbKK..",
-      ".KSSbbbbbbbbbbbbRRRRRRRRRKK.",
-      "KSSSSSSsssssssRRRRRRRRRRRRKK",
-      ".KSSSSSSSSsssRRRRRRRRRRRRKKK",
-      "..KKSSSSSSssRRRRRRRRRRRFFFFK",
-      "....KKKSSSSSRRRRRRRRRRFFFFK.",
-      ".......KKKKKRRRRRRRRKFFFFK..",
-      "............KKKKKKKK.KKK...."
-    ]
+  // Frame 1: Tail swung UP
+  const fishFrame1 = [
+    ".KKKKKKKK...........",
+    "KFFFFFFKKKHHHHcKK...",
+    "KFFFFFFFKCHHHHHHHcK.",
+    ".KFFFFFKCCHHHHHHHcK.",
+    "..KKKKKKCCCHHHHWWEcK",
+    "......KCCCCCCWGGECK.",
+    "......KCCFFCCWGGECK.",
+    "......KCCffffCCCCcK.",
+    ".......KCBCCCCCCccK.",
+    ".......KCBBBBBBcK...",
+    "........KKBBBBcK....",
+    "..........KKKK......"
   ];
 
-  // --- 3. ANGELFISH (Tall, Majestic, Zebra Emerald/Silver) ---
-  const angelPalette = {
-    'S': '#E2E8F0', // Silver Base
-    's': '#94A3B8', // Shadow Silver
-    'C': '#38EF7D', // Emerald Accent
-    'c': '#11998E', // Deep Emerald
-    'K': '#0F172A', // Dark Zebra Stripe / Outline
-    'Y': '#FBBF24', // Yellow highlight
-    'E': '#020617', // Pupil
-    'G': '#F8FAFC', // Eye sparkle
-    'F': '#A7F3D0', // Translucent Emerald Fin
-  };
-
-  const angelFrames = [
-    // Frame 0:
-    [
-      ".............KK.............",
-      "............KFFK............",
-      "...........KFFFFK...........",
-      "..........KFFFFFK...........",
-      ".........KFFFFFFK...........",
-      "........KFFFFFFFKK..........",
-      ".......KKKFFFFFFKK..........",
-      "......KKSSKKFFKKKK..........",
-      ".....KKSSSKKKKSSSSKK........",
-      "....KKSGEEKKKKSSSSSKK.......",
-      "...KKSSGEEKKKKSSSSSSSKK.....",
-      "..KKSSSSSSKKKKKKSSSSSSSKK...",
-      ".KKSSSSCCSSKKKCCCCSSSSSKK...",
-      "KKSSSSSCCCCSKKCCCCSSSSSSKK..",
-      ".KKSSSSSCCCCSKCCCCSSSSSSKFK.",
-      "..KKSSSSSCCCKKKCCCSSSSSFFFFK",
-      "...KKSSSSSCSSKKKCSSSSSSFFFFK",
-      "....KKSSSSSSSSKKKSSSSSFFFFK.",
-      ".....KKKSSSSSSKKKSSSSKKKK...",
-      ".......KKSSSSSKKKSSSKK......",
-      "........KKKSSSKKKSSKK.......",
-      "..........KKKKKKKKK.........",
-      "...........KFFKK............",
-      "..........KFFFK.............",
-      ".........KFFFFK.............",
-      "........KFFFFK..............",
-      ".......KKFFFK...............",
-      "......KKKKKK................"
-    ],
-    // Frame 1: tail flex
-    [
-      ".............KK.............",
-      "............KFFK............",
-      "...........KFFFFK...........",
-      "..........KFFFFFK...........",
-      ".........KFFFFFFK...........",
-      "........KFFFFFFFKK..........",
-      ".......KKKFFFFFFKK..........",
-      "......KKSSKKFFKKKK..........",
-      ".....KKSSSKKKKSSSSKK...KKK..",
-      "....KKSGEEKKKKSSSSSKK.KFFFK.",
-      "...KKSSGEEKKKKSSSSSSSKKFFFK.",
-      "..KKSSSSSSKKKKKKSSSSSSKFFK..",
-      ".KKSSSSCCSSKKKCCCCSSSSSKK...",
-      "KKSSSSSCCCCSKKCCCCSSSSSSKK..",
-      ".KKSSSSSCCCCSKCCCCSSSSSSKK..",
-      "..KKSSSSSCCCKKKCCCSSSSSFFK..",
-      "...KKSSSSSCSSKKKCSSSSSSFFFK.",
-      "....KKSSSSSSSSKKKSSSSSFFFFK.",
-      ".....KKKSSSSSSKKKSSSSKKKK...",
-      ".......KKSSSSSKKKSSSKK......",
-      "........KKKSSSKKKSSKK.......",
-      "..........KKKKKKKKK.........",
-      "...........KFFKK............",
-      "..........KFFFK.............",
-      ".........KFFFFK.............",
-      "........KFFFFK..............",
-      ".......KKFFFK...............",
-      "......KKKKKK................"
-    ]
+  // Frame 2: Tail swung DOWN
+  const fishFrame2 = [
+    ".........KKKK.......",
+    ".......KKHHHHcKK....",
+    "........KCHHHHHHHcK.",
+    ".......KCCHHHHHHHcK.",
+    "......KCCCHHHHWWEcK.",
+    "......KCCCCCCWGGECK.",
+    "..KKKKKCCFFCCWGGECK.",
+    ".KFFFFFKCffffCCCCcK.",
+    "KFFFFFFKCBCCCCCCccK.",
+    "KFFFFFFKKCBBBBBBcK..",
+    ".KKKKKK.KKBBBBcK....",
+    "..........KKKK......"
   ];
 
-  // --- 4. PUFFERFISH (Round, Spiky, Golden-Teal Cute Cyber) ---
-  const pufferPalette = {
-    'Y': '#FFE066', // Golden Yellow
-    'y': '#F59E0B', // Amber Shadow
-    'T': '#14B8A6', // Teal Spot
-    't': '#0D9488', // Dark Teal
-    'W': '#FFFBEB', // Belly Cream
-    'w': '#FEF3C7', // Belly Shadow
-    'K': '#1C1917', // Dark Outline
-    'E': '#0C0A09', // Eye Pupil
-    'G': '#FFFFFF', // Glint
-    'P': '#F43F5E', // Cute Pink Cheek
-    'F': '#FDE68A', // Flutter Fin
+  const fishFrames = [fishFrame0, fishFrame1, fishFrame2];
+
+  // Color palettes for simple, distinct, vibrant fish
+  const colorPalettes = {
+    // 1. Orange Clown/Goldfish (AquaOS)
+    clownfish: {
+      C: '#FF7A29', c: '#D94B0A', H: '#FFA966', B: '#FFF0D4', F: '#FF944D', f: '#C43D04',
+      W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
+    },
+    // 2. Cyan / Neon Blue Tang (HyperStream)
+    neontetra: {
+      C: '#00D2FF', c: '#007BB8', H: '#80E8FF', B: '#E0F7FF', F: '#38BDF8', f: '#0284C7',
+      W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
+    },
+    // 3. Mint / Emerald Angelfish (DeepQuery)
+    angelfish: {
+      C: '#10B981', c: '#047857', H: '#6EE7B7', B: '#ECFDF5', F: '#34D399', f: '#059669',
+      W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
+    },
+    // 4. Golden Yellow Sunfish (VaultPulse)
+    pufferfish: {
+      C: '#FBBF24', c: '#D97706', H: '#FDE68A', B: '#FFFBEB', F: '#FCD34D', f: '#B45309',
+      W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
+    },
+    // 5. Coral / Ruby Koi (Aura Compute)
+    koi: {
+      C: '#F43F5E', c: '#BE123C', H: '#FDA4AF', B: '#FFF1F2', F: '#FB7185', f: '#9F1239',
+      W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
+    },
+    // 6. Royal Purple / Violet Guppy (PixelForge UI)
+    guppy: {
+      C: '#A855F7', c: '#7E22CE', H: '#D8B4FE', B: '#FAF5FF', F: '#C084FC', f: '#6B21A8',
+      W: '#FFFFFF', E: '#090D16', G: '#FFFFFF', K: '#090D16'
+    }
   };
 
-  const pufferFrames = [
-    // Frame 0: Normal
-    [
-      ".........KKKKKKK............",
-      ".......KKTYYYYYYKK..........",
-      "......KTTYYYYTTYYYKK........",
-      ".....KTYYYTTYYYYYYYYKK......",
-      "....KYYGEEYYYYYTTTYYYKK.....",
-      "...KYYYGEEYYYYYTTTYYYYKK....",
-      "..KTYYYYYYYYYYYYTYYYYYYKK...",
-      ".KTTYYYPPPPYYYYYYYYYYYYYK...",
-      "KTYYYYYPPPPWWWWWWWWWWYYYKK..",
-      "KYYYYYYYWWWWWWWWWWWWWWYYKKFK",
-      "KYYYYYYWWWWWWWWWWWWWWWYKFFFK",
-      "KTYYYTTWWWWWWWWWWWWWWWYKKFFK",
-      ".KTTTTYYWWWWWWWWWWWWWYYK.KK.",
-      "..KYYYYYYWWWWWWWWWWYYKK.....",
-      "...KKTTYYYYWWWWWWYYKK.......",
-      ".....KKKYYYYYYYYKKK.........",
-      "........KKKKKKKK............"
-    ],
-    // Frame 1: Fin wave
-    [
-      ".........KKKKKKK............",
-      ".......KKTYYYYYYKK..........",
-      "......KTTYYYYTTYYYKK...KK...",
-      ".....KTYYYTTYYYYYYYYKKKFFK..",
-      "....KYYGEEYYYYYTTTYYYKFFFK..",
-      "...KYYYGEEYYYYYTTTYYYKFFK...",
-      "..KTYYYYYYYYYYYYTYYYYYKK....",
-      ".KTTYYYPPPPYYYYYYYYYYYYYK...",
-      "KTYYYYYPPPPWWWWWWWWWWYYYKK..",
-      "KYYYYYYYWWWWWWWWWWWWWWYYKK..",
-      "KYYYYYYWWWWWWWWWWWWWWWYK....",
-      "KTYYYTTWWWWWWWWWWWWWWWYK....",
-      ".KTTTTYYWWWWWWWWWWWWWYYK....",
-      "..KYYYYYYWWWWWWWWWWYYKK.....",
-      "...KKTTYYYYWWWWWWYYKK.......",
-      ".....KKKYYYYYYYYKKK.........",
-      "........KKKKKKKK............"
-    ]
-  ];
-
-  // --- 5. GOLDEN KOI (Ruby & Gold Imperial Scales) ---
-  const koiPalette = {
-    'W': '#F8FAFC', // Pure Pearl White
-    'w': '#CBD5E1', // Scale Shading
-    'R': '#EF4444', // Imperial Red Kohaku Spot
-    'r': '#B91C1C', // Dark Crimson
-    'O': '#F97316', // Vibrant Gold
-    'o': '#C2410C', // Deep Gold
-    'K': '#0F172A', // Outline
-    'E': '#020617', // Eye
-    'G': '#FFFFFF', // Glint
-    'F': '#FECDD3', // Silk Fin
-  };
-
-  const koiFrames = [
-    // Frame 0:
-    [
-      "...........KKKKKK...........",
-      ".........KKWWRRRRKK.........",
-      "........KWWWRRRRRRRKK.......",
-      ".......KWWGEERRRRRRRRKK.....",
-      "......KWWWGEERRRRRROOOKK....",
-      ".....KWWWWWRRRRRROOOOOOKK...",
-      "....KWWWWWWWRRRROOOOOOOOK...",
-      "...KWWWWWWWWWROOOOOOOOOOOK..",
-      "..KWWWWWWWWWWROOOOOOOOOOOKK.",
-      ".KFFWWWWWWWWWWROOOOOOOOOOFK.",
-      "KFFFFWWWWWWWWWWRRROOOOOOFFFK",
-      ".KFFfWWWWWWWWWWWRRROOOOOfffK",
-      "..KWWWWWWWWWWWWWWRRROOOKKK..",
-      "...KWWWWWWWWWWWWWRRROOK.....",
-      "....KKWWWWWWWWWWWRRROK......",
-      "......KKKWWWWWWWWRRKK.......",
-      ".........KKKKKKKKKK........."
-    ],
-    // Frame 1:
-    [
-      "...........KKKKKK....KKKK...",
-      ".........KKWWRRRRKK.KFFFK...",
-      "........KWWWRRRRRRRKKFFFK...",
-      ".......KWWGEERRRRRRRRKFK....",
-      "......KWWWGEERRRRRROOOKK....",
-      ".....KWWWWWRRRRRROOOOOOKK...",
-      "....KWWWWWWWRRRROOOOOOOOK...",
-      "...KWWWWWWWWWROOOOOOOOOOOK..",
-      "..KWWWWWWWWWWROOOOOOOOOOOKK.",
-      ".KFFWWWWWWWWWWROOOOOOOOOOK..",
-      "KFFFFWWWWWWWWWWRRROOOOOOOK..",
-      ".KFFfWWWWWWWWWWWRRROOOOOOK..",
-      "..KWWWWWWWWWWWWWWRRROOOKKK..",
-      "...KWWWWWWWWWWWWWRRROOK.....",
-      "....KKWWWWWWWWWWWRRROK......",
-      "......KKKWWWWWWWWRRKK.......",
-      ".........KKKKKKKKKK........."
-    ]
-  ];
-
-  // --- 6. CYBER GUPPY / BETTA (Violet, Magenta & Flowing Tails) ---
-  const guppyPalette = {
-    'V': '#A855F7', // Violet
-    'v': '#7E22CE', // Deep Violet
-    'M': '#EC4899', // Magenta
-    'm': '#BE185D', // Dark Magenta
-    'C': '#38BDF8', // Cyan Highlight
-    'K': '#090514', // Outline
-    'E': '#030712', // Eye
-    'G': '#FDF4FF', // Sparkle
-    'F': '#D946EF', // Majestic Fan Fin
-    'f': '#9333EA', // Fin Rib
-  };
-
-  const guppyFrames = [
-    // Frame 0:
-    [
-      ".........KKKK...............",
-      ".......KKVVVVKK.....KKKKK...",
-      "......KVVGGVVVVKK.KKFFFFFK..",
-      ".....KVVGGEEVVVVVKKFFFFFFFKK",
-      "....KVVVVEEVVVVVVVFFFFFFfffK",
-      "...KVVVMVVVVVVVVVVFFFFFFfffK",
-      "..KVVVMMMVVVVVVVVVFFFFFFFFFK",
-      ".KFFVMMMMMMVVVVVVVFFFFFFFFK.",
-      "KFFFFMMMMMMMMVVVVVVFFFFFFK..",
-      ".KFFFMMMMMMMMMMVVVFFFFFKK...",
-      "..KFFfVMMMMMMMMMMVFFFKK.....",
-      "...KKVVVVMMMMMMMMVKKK.......",
-      ".....KKKVVVVVVVKKK..........",
-      "........KKKKKKKK............"
-    ],
-    // Frame 1:
-    [
-      ".........KKKK...............",
-      ".......KKVVVVKK.............",
-      "......KVVGGVVVVKK...KKKKK...",
-      ".....KVVGGEEVVVVVKKKFFFFFK..",
-      "....KVVVVEEVVVVVVVVFFFFFFFKK",
-      "...KVVVMVVVVVVVVVVVFFFFFfffK",
-      "..KVVVMMMVVVVVVVVVFFFFFFfffK",
-      ".KFFVMMMMMMVVVVVVVFFFFFFFFFK",
-      "KFFFFMMMMMMMMVVVVVVFFFFFFFK.",
-      ".KFFFMMMMMMMMMMVVVFFFFFKKK..",
-      "..KFFfVMMMMMMMMMMVFFFKK.....",
-      "...KKVVVVMMMMMMMMVKKK.......",
-      ".....KKKVVVVVVVKKK..........",
-      "........KKKKKKKK............"
-    ]
-  ];
-
-  // Compile all sprite matrices once
-  function initSprites() {
-    cache['clownfish'] = clownfishFrames.map(m => createMatrixSprite(m, clownfishPalette, 2));
-    cache['neontetra'] = neonFrames.map(m => createMatrixSprite(m, neonPalette, 2));
-    cache['angelfish'] = angelFrames.map(m => createMatrixSprite(m, angelPalette, 2));
-    cache['pufferfish'] = pufferFrames.map(m => createMatrixSprite(m, pufferPalette, 2));
-    cache['koi'] = koiFrames.map(m => createMatrixSprite(m, koiPalette, 2));
-    cache['guppy'] = guppyFrames.map(m => createMatrixSprite(m, guppyPalette, 2));
-
-    // Scenery Elements
-    cache['chest'] = createChestSprite();
-    cache['coral_pink'] = createCoralSprite('#F43F5E', '#BE123C', '#FDA4AF');
-    cache['coral_purple'] = createCoralSprite('#A855F7', '#7E22CE', '#E9D5FF');
-    cache['shell'] = createShellSprite();
-    cache['starfish'] = createStarfishSprite();
+  // --- LARGER, MORE VIBRANT CORAL SPRITES ---
+  function createBigCoralSprite(primaryColor, darkColor, highlightColor) {
+    const palette = {
+      'C': primaryColor,
+      'c': darkColor,
+      'H': highlightColor,
+      'K': '#090D16'
+    };
+    // 24x18 larger branching coral
+    const m = [
+      "....KK.......KK.........KK..",
+      "...KCCK.....KCCK.......KCCK.",
+      "..KHCCK.....KHCCK.....KHCCK.",
+      "..KHCCcK...KHCCcK.....KHCCcK",
+      "..KHHCCcKK.KHCCcK....KHHCCcK",
+      "...KHHCCcKKKHCCcKK..KHHCCcK.",
+      "...KHHCCcKKHHCCcKK.KHHCCcK..",
+      "....KHHCCcKHHCCcKKKHHCCcK...",
+      "....KHHCCcKHHCCcKKHHCCcK....",
+      ".....KHHCCcHHCCcKHHCCcK.....",
+      ".....KHHCCcHHCCcKHHCCcK.....",
+      "......KHCCCCCCCCCCCCcK......",
+      "......KHCCCCCCCCCCCCcK......",
+      ".......KcccccccccccccK......",
+      "........KcccccccccccK.......",
+      ".........KKccccccccKK.......",
+      "...........KKKKKKKK........."
+    ];
+    return createMatrixSprite(m, palette, 3);
   }
 
+  // Round Brain Coral / Sea Anemone
+  function createBrainCoralSprite(c1, c2, c3) {
+    const palette = { 'A': c1, 'B': c2, 'C': c3, 'K': '#090D16' };
+    const m = [
+      "........KKKKKKKK........",
+      "......KKCAAAAAACKK......",
+      "....KKCAAAAAAAAACKK.....",
+      "...KCAACAAAAACAACAK.....",
+      "..KCAAACAAAAACAAACAK....",
+      ".KCAAAAACAAAACAAAACAK...",
+      ".KCAAAAACAAAACAAAACAK...",
+      "KCAAAAAACAAAACAAAAACAK..",
+      "KCAAAACCCCCCCCCCACCAAK..",
+      "KCAAACBBBBBBBBBCCCACAK..",
+      "KCAAACBBBBBBBBBBCCACAK..",
+      ".KAAACBBBBBBBBBBCCAAK...",
+      ".KBAACBBBBBBBBBBCCBAK...",
+      "..KBBACCCCCCCCCCBBBK....",
+      "...KKBBBBBBBBBBBBKK.....",
+      ".....KKKKKKKKKKKK......."
+    ];
+    return createMatrixSprite(m, palette, 3);
+  }
+
+  // Chest Sprite
   function createChestSprite() {
     const palette = {
-      'W': '#78350F', // Wood dark
-      'w': '#B45309', // Wood light
-      'G': '#FBBF24', // Gold trim
-      'g': '#D97706', // Dark gold
-      'K': '#1C1917', // Outline
-      'L': '#38BDF8', // Cyan treasure glow inside
+      'W': '#78350F',
+      'w': '#B45309',
+      'G': '#FBBF24',
+      'g': '#D97706',
+      'K': '#090D16',
+      'L': '#38BDF8',
       'l': '#BAE6FD',
     };
     const m = [
@@ -480,102 +204,78 @@ const PixelSprites = (() => {
       "..KKGGGGGGGGGGGGGGGGGGGGKK..",
       "....KKKKKKKKKKKKKKKKKKKK...."
     ];
-    return createMatrixSprite(m, palette, 2);
+    return createMatrixSprite(m, palette, 3);
   }
 
-  function createCoralSprite(c1, c2, c3) {
-    const palette = { 'A': c1, 'B': c2, 'C': c3, 'K': '#0F172A' };
-    const m = [
-      "....KK...KK.....KK..........",
-      "...KCCK.KCCK...KCCK.........",
-      "...KCAK.KCAK...KCAK..KK.....",
-      "...KCAKKKCAK...KCAK.KCCK....",
-      "....KCAACAAKK..KCAKKKCAK....",
-      "....KCAAACAAK..KCAACAAK.....",
-      ".....KBAAACAKKKKCAAABK......",
-      ".....KBAAAAACAAACAAABK......",
-      "......KBBAAAAAAAAABBK.......",
-      "......KBBBAAAAAAAABBK.......",
-      ".......KBBBBAAAABBBK........",
-      "........KKBBBBBBKK..........",
-      "..........KKKKKK............"
-    ];
-    return createMatrixSprite(m, palette, 2);
+  function initSprites() {
+    // Generate clean fish species in each colorway
+    Object.keys(colorPalettes).forEach(species => {
+      const palette = colorPalettes[species];
+      cache[species] = fishFrames.map(m => createMatrixSprite(m, palette, 2));
+    });
+
+    // Rich Coral Formations
+    cache['coral_pink'] = createBigCoralSprite('#F43F5E', '#BE123C', '#FDA4AF');
+    cache['coral_purple'] = createBigCoralSprite('#A855F7', '#7E22CE', '#E9D5FF');
+    cache['coral_orange'] = createBigCoralSprite('#FB923C', '#C2410C', '#FED7AA');
+    cache['coral_cyan'] = createBrainCoralSprite('#06B6D4', '#0E7490', '#A5F3FC');
+    cache['coral_yellow'] = createBrainCoralSprite('#EAB308', '#A16207', '#FEF08A');
+
+    cache['chest'] = createChestSprite();
   }
 
-  function createShellSprite() {
-    const palette = {
-      'W': '#FFFBEB',
-      'w': '#FDE68A',
-      'Y': '#F59E0B',
-      'K': '#451A03'
-    };
-    const m = [
-      "......KKKKKK......",
-      "....KKWWWWWWKK....",
-      "...KWWwWwwWwWWK...",
-      "..KWWwWWwwWWwWWK..",
-      ".KWWwWWYwwYWWwWWK.",
-      ".KWWwWWYwwYWWwWWK.",
-      "..KKWWwYwwYwWWKK..",
-      "....KKKKYYYYKK....",
-      "......KKKKKK......"
-    ];
-    return createMatrixSprite(m, palette, 2);
+  /**
+   * Helper to load external PNG image sprites if user wishes to import custom drawn art.
+   * Handles onload asynchronous events safely so nothing breaks or remains invisible.
+   */
+  function loadSpriteImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = (err) => reject(err);
+      img.src = url;
+    });
   }
 
-  function createStarfishSprite() {
-    const palette = {
-      'O': '#FB923C',
-      'o': '#EA580C',
-      'Y': '#FEF08A',
-      'K': '#431407'
-    };
-    const m = [
-      ".......KK.......",
-      "......KOOK......",
-      "......KYYK......",
-      ".....KYYYYK.....",
-      "..KKKKOYYOKKKK..",
-      ".KOYYYYYYYYYYOK.",
-      "..KKOYYYYYYOKK..",
-      "....KOYYYYOK....",
-      "...KOOYYYYOOK...",
-      "..KOOKK..KKOOK..",
-      "..KKK......KKK.."
-    ];
-    return createMatrixSprite(m, palette, 2);
-  }
-
-  // Draw seaweed dynamically using swaying pixel joints
-  function drawPixelKelp(ctx, startX, startY, height, time, swayOffset = 0) {
-    const segments = Math.floor(height / 10);
+  // Draw lush, taller, thicker seaweed with sine wave sway
+  function drawPixelKelp(ctx, startX, startY, height, time, swayOffset = 0, isFront = false) {
+    const segments = Math.floor(height / 12);
     const segHeight = height / segments;
     let currX = startX;
     let currY = startY;
 
     ctx.save();
     for (let i = 0; i < segments; i++) {
-      const sway = Math.sin(time * 1.5 + i * 0.4 + swayOffset) * (i * 2.2);
+      // Gentle sinusoidal wave sway
+      const sway = Math.sin(time * 1.6 + i * 0.35 + swayOffset) * (i * 2.8);
       const nextX = startX + sway;
       const nextY = currY - segHeight;
 
-      // Color gradient from deep sea kelp to bright tip
+      // Color shading
       const ratio = i / segments;
-      const r = Math.round(16 + ratio * 34);
-      const g = Math.round(130 + ratio * 85);
-      const b = Math.round(70 + ratio * 45);
+      let r, g, b;
+      if (isFront) {
+        r = Math.round(16 + ratio * 40);
+        g = Math.round(155 + ratio * 85);
+        b = Math.round(65 + ratio * 45);
+      } else {
+        r = Math.round(10 + ratio * 25);
+        g = Math.round(105 + ratio * 55);
+        b = Math.round(45 + ratio * 30);
+      }
       ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
 
-      // Draw pixelated blade
-      const bladeW = Math.max(4, 9 - i * 0.7);
+      // Thicker blade width
+      const bladeW = Math.max(6, 14 - i * 0.6);
       ctx.fillRect(Math.round(currX - bladeW / 2), Math.round(currY - segHeight), Math.round(bladeW), Math.round(segHeight + 1));
 
-      // Little leaf node every other segment
-      if (i % 2 === 0 && i < segments - 1) {
-        ctx.fillStyle = `rgb(${r + 20}, ${g + 30}, ${b + 10})`;
+      // Leaf fronds extending outward
+      if (i % 2 === 0 && i > 1 && i < segments - 1) {
+        ctx.fillStyle = `rgb(${r + 25}, ${g + 30}, ${b + 15})`;
         const dir = (i % 4 === 0) ? 1 : -1;
-        ctx.fillRect(Math.round(currX + dir * bladeW), Math.round(currY - segHeight / 2), 6, 4);
+        const leafW = 10 + (segments - i) * 0.4;
+        ctx.fillRect(Math.round(currX + (dir === 1 ? bladeW / 2 : -bladeW / 2 - leafW)), Math.round(currY - segHeight / 2), Math.round(leafW), 5);
       }
 
       currX = nextX;
@@ -584,35 +284,42 @@ const PixelSprites = (() => {
     ctx.restore();
   }
 
-  // Draw rising pixel bubble
-  function drawPixelBubble(ctx, x, y, radius, opacity = 0.8) {
+  // Draw cute glossy pixel bubble of any size
+  function drawPixelBubble(ctx, x, y, radius, opacity = 0.85) {
     ctx.save();
     ctx.globalAlpha = opacity;
-    const r = Math.max(2, Math.round(radius));
+    const r = Math.max(3, Math.round(radius));
 
-    // Outer ring
+    // Outer pixel ring
     ctx.fillStyle = '#BAE6FD';
-    ctx.fillRect(Math.round(x - r), Math.round(y - r + 1), r * 2, r * 2 - 2);
-    ctx.fillRect(Math.round(x - r + 1), Math.round(y - r), r * 2 - 2, r * 2);
+    ctx.fillRect(Math.round(x - r + 1), Math.round(y - r), (r - 1) * 2, r * 2);
+    ctx.fillRect(Math.round(x - r), Math.round(y - r + 1), r * 2, (r - 1) * 2);
 
-    // Inner translucent core
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.fillRect(Math.round(x - r + 1), Math.round(y - r + 1), r * 2 - 2, r * 2 - 2);
+    // Inner translucent sphere
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.fillRect(Math.round(x - r + 2), Math.round(y - r + 2), (r - 2) * 2, (r - 2) * 2);
 
-    // Specular highlight dot
+    // Cute glossy highlight pixel
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(Math.round(x - Math.floor(r / 2)), Math.round(y - Math.floor(r / 2)), Math.max(1, Math.round(r * 0.5)), Math.max(1, Math.round(r * 0.5)));
+    const hlSize = Math.max(2, Math.floor(r * 0.45));
+    ctx.fillRect(Math.round(x - Math.floor(r * 0.55)), Math.round(y - Math.floor(r * 0.55)), hlSize, hlSize);
+
+    // Secondary subtle lower glint for big bubbles
+    if (r >= 8) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.fillRect(Math.round(x + Math.floor(r * 0.3)), Math.round(y + Math.floor(r * 0.3)), 2, 2);
+    }
 
     ctx.restore();
   }
 
-  // Draw pixel fish flake food
+  // Draw food pellet
   function drawPixelFlake(ctx, x, y, frame) {
     ctx.save();
     ctx.fillStyle = (frame % 2 === 0) ? '#F59E0B' : '#EF4444';
-    ctx.fillRect(Math.round(x), Math.round(y), 4, 3);
+    ctx.fillRect(Math.round(x), Math.round(y), 5, 4);
     ctx.fillStyle = '#FDE68A';
-    ctx.fillRect(Math.round(x + 1), Math.round(y + 1), 2, 2);
+    ctx.fillRect(Math.round(x + 1), Math.round(y + 1), 3, 2);
     ctx.restore();
   }
 
@@ -622,7 +329,8 @@ const PixelSprites = (() => {
     getScenery: (key) => cache[key],
     drawPixelKelp,
     drawPixelBubble,
-    drawPixelFlake
+    drawPixelFlake,
+    loadSpriteImage
   };
 })();
 

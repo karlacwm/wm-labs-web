@@ -3,7 +3,7 @@
  * 
  * 60FPS HTML5 Canvas physics engine.
  * Handles fish autonomous flocking & wandering, cursor curiosity, food physics,
- * environmental kelp swaying, bubble particles, and product hit-testing.
+ * lush swaying kelp, large background glossy bubbles, corals, and product hit-testing.
  */
 
 class AquariumEngine {
@@ -19,10 +19,11 @@ class AquariumEngine {
     this.height = window.innerHeight;
     this.pixelRatio = window.devicePixelRatio || 1;
 
-    // Simulation state
+    // Simulation entities
     this.fishList = [];
     this.foodFlakes = [];
     this.bubbles = [];
+    this.bgBubbles = []; // Large cute background bubbles
     this.ambientMotes = [];
     this.kelpStalks = [];
     this.sceneryProps = [];
@@ -32,7 +33,7 @@ class AquariumEngine {
     this.hoveredFish = null;
     this.selectedFish = null;
 
-    // Time & Mode
+    // Time & Lighting Mode
     this.lastTime = performance.now();
     this.timeSeconds = 0;
     this.isNightMode = false;
@@ -71,7 +72,6 @@ class AquariumEngine {
     this.ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
     this.ctx.imageSmoothingEnabled = false;
 
-    // Re-anchor scenery
     this.setupEnvironment();
   }
 
@@ -114,7 +114,6 @@ class AquariumEngine {
       const clickedFish = this.findFishAt(pos.x, pos.y);
 
       if (clickedFish) {
-        // Clicked a product fish!
         clickedFish.celebrate();
         SoundFX.playClick();
         this.selectedFish = clickedFish;
@@ -122,7 +121,6 @@ class AquariumEngine {
           this.options.onFishClick(clickedFish.product, clickedFish);
         }
       } else {
-        // Clicked water: drop food!
         this.spawnFood(pos.x, pos.y, 4);
         SoundFX.playBubble();
       }
@@ -132,40 +130,57 @@ class AquariumEngine {
   }
 
   setupEnvironment() {
-    // Kelp forest placement along the bottom
+    // 1. Lush, taller kelp stalks
     this.kelpStalks = [];
-    const stalkCount = Math.max(8, Math.floor(this.width / 90));
+    const stalkCount = Math.max(12, Math.floor(this.width / 75));
     for (let i = 0; i < stalkCount; i++) {
-      // Cluster more at edges for tank aesthetics
-      const isEdge = i < 3 || i > stalkCount - 4;
-      const x = (i / (stalkCount - 1)) * (this.width - 80) + 40 + (Math.random() * 30 - 15);
-      const height = isEdge ? 180 + Math.random() * 120 : 100 + Math.random() * 90;
+      const isEdge = i < 4 || i > stalkCount - 5;
+      const x = (i / (stalkCount - 1)) * (this.width - 60) + 30 + (Math.random() * 26 - 13);
+      // Taller kelp (up to 380px tall)
+      const height = isEdge ? 240 + Math.random() * 140 : 160 + Math.random() * 110;
       this.kelpStalks.push({
         x,
-        baseY: this.height - 25,
+        baseY: this.height - 20,
         height,
-        swayOffset: Math.random() * Math.PI * 2
+        swayOffset: Math.random() * Math.PI * 2,
+        isFront: i % 2 === 0
       });
     }
 
-    // Scenery props on sea floor
+    // 2. Rich, larger coral reef formations across sea floor
     this.sceneryProps = [
-      { type: 'chest', x: Math.min(this.width * 0.22, 220), y: this.height - 55 },
-      { type: 'coral_pink', x: Math.min(this.width * 0.12, 110), y: this.height - 48 },
-      { type: 'coral_purple', x: Math.max(this.width * 0.85, this.width - 150), y: this.height - 50 },
-      { type: 'shell', x: this.width * 0.45, y: this.height - 25 },
-      { type: 'starfish', x: this.width * 0.65, y: this.height - 24 }
+      { type: 'coral_pink', x: this.width * 0.06, y: this.height - 72 },
+      { type: 'coral_orange', x: this.width * 0.22, y: this.height - 68 },
+      { type: 'chest', x: this.width * 0.38, y: this.height - 62 },
+      { type: 'coral_cyan', x: this.width * 0.54, y: this.height - 70 },
+      { type: 'coral_yellow', x: this.width * 0.70, y: this.height - 66 },
+      { type: 'coral_purple', x: this.width * 0.88, y: this.height - 74 },
     ];
 
-    // Ambient floating plankton/particles
+    // 3. Cute large background bubbles
+    this.bgBubbles = [];
+    const bgBubbleCount = Math.max(14, Math.floor(this.width / 80));
+    for (let i = 0; i < bgBubbleCount; i++) {
+      this.bgBubbles.push({
+        x: Math.random() * this.width,
+        y: Math.random() * this.height,
+        radius: 8 + Math.random() * 14, // 8px to 22px big glossy bubbles!
+        vy: -0.4 - Math.random() * 0.5,
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: 1.5 + Math.random() * 1.5,
+        opacity: 0.45 + Math.random() * 0.35
+      });
+    }
+
+    // 4. Ambient floating light motes
     this.ambientMotes = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 45; i++) {
       this.ambientMotes.push({
         x: Math.random() * this.width,
         y: Math.random() * this.height,
         vx: (Math.random() - 0.5) * 0.4,
         vy: -0.15 - Math.random() * 0.25,
-        size: Math.random() > 0.7 ? 2 : 1,
+        size: Math.random() > 0.6 ? 2 : 1,
         alpha: 0.15 + Math.random() * 0.4
       });
     }
@@ -174,16 +189,14 @@ class AquariumEngine {
   loadProducts(products) {
     this.fishList = [];
     products.forEach((prod, index) => {
-      // Stagger initial positions nicely across the tank
-      const x = 100 + (index % 3) * (this.width * 0.3) + Math.random() * 60;
-      const y = 140 + Math.floor(index / 3) * (this.height * 0.25) + Math.random() * 50;
+      const x = 120 + (index % 3) * (this.width * 0.28) + Math.random() * 50;
+      const y = 140 + Math.floor(index / 3) * (this.height * 0.28) + Math.random() * 40;
       const fish = new FishEntity(prod, x, y, this);
       this.fishList.push(fish);
     });
   }
 
   findFishAt(x, y) {
-    // Check backwards to select topmost rendered fish
     for (let i = this.fishList.length - 1; i >= 0; i--) {
       const f = this.fishList[i];
       if (f.containsPoint(x, y)) {
@@ -225,11 +238,10 @@ class AquariumEngine {
       });
     }
 
-    // Alert nearby fish of food arrival!
     this.fishList.forEach(fish => fish.noticeFood(x, y));
   }
 
-  spawnBubble(x, y, radius = 3, riseSpeed = 1.2) {
+  spawnBubble(x, y, radius = 4, riseSpeed = 1.3) {
     this.bubbles.push({
       x,
       y,
@@ -237,7 +249,7 @@ class AquariumEngine {
       vy: -riseSpeed - Math.random() * 0.6,
       radius,
       wobble: Math.random() * Math.PI * 2,
-      opacity: 0.7 + Math.random() * 0.3
+      opacity: 0.75 + Math.random() * 0.25
     });
   }
 
@@ -257,7 +269,7 @@ class AquariumEngine {
     }
   }
 
-  // --- MAIN SIMULATION & RENDER LOOP ---
+  // --- SIMULATION & RENDER LOOP ---
   loop(currentTime) {
     const dt = Math.min((currentTime - this.lastTime) / 1000, 0.1);
     this.lastTime = currentTime;
@@ -270,27 +282,37 @@ class AquariumEngine {
   }
 
   update(dt) {
-    // 1. Treasure chest continuous bubbles
-    if (Math.random() < 0.25) {
+    // 1. Treasure chest bubbling
+    if (Math.random() < 0.28) {
       const chest = this.sceneryProps.find(p => p.type === 'chest');
       if (chest) {
-        this.spawnBubble(chest.x + 28 + (Math.random() * 8 - 4), chest.y + 10, 2 + Math.random() * 3, 1.4);
+        this.spawnBubble(chest.x + 36 + (Math.random() * 8 - 4), chest.y + 12, 3 + Math.random() * 4, 1.5);
       }
     }
 
-    // 2. Update Bubbles
+    // 2. Large Background Bubbles rising smoothly
+    this.bgBubbles.forEach(b => {
+      b.wobble += dt * b.wobbleSpeed;
+      b.x += Math.sin(b.wobble) * 0.6;
+      b.y += b.vy;
+      if (b.y < -30) {
+        b.y = this.height + 20;
+        b.x = Math.random() * this.width;
+      }
+    });
+
+    // 3. Foreground Bubbles
     for (let i = this.bubbles.length - 1; i >= 0; i--) {
       const b = this.bubbles[i];
       b.wobble += dt * 4;
       b.x += Math.sin(b.wobble) * 0.5 + b.vx;
       b.y += b.vy;
-      // Pop at water line (y < 60)
-      if (b.y < 60) {
+      if (b.y < 55) {
         this.bubbles.splice(i, 1);
       }
     }
 
-    // 3. Update Ambient Motes
+    // 4. Ambient Motes
     this.ambientMotes.forEach(m => {
       m.x += m.vx;
       m.y += m.vy;
@@ -299,17 +321,15 @@ class AquariumEngine {
       if (m.x > this.width) m.x = 0;
     });
 
-    // 4. Update Food Flakes
+    // 5. Food Flakes
     for (let i = this.foodFlakes.length - 1; i >= 0; i--) {
       const f = this.foodFlakes[i];
       f.animTime += dt;
       f.y += f.vy;
       f.x += Math.sin(f.animTime * 3) * 0.4;
 
-      // Bottom substrate reached
       if (f.y >= this.height - 35) {
         f.vy = 0;
-        // Fade or get cleaned up
         if (f.animTime > 8) {
           this.foodFlakes.splice(i, 1);
         }
@@ -319,7 +339,7 @@ class AquariumEngine {
       }
     }
 
-    // 5. Update Fish
+    // 6. Fish Entities
     this.fishList.forEach(fish => fish.update(dt, this));
   }
 
@@ -333,18 +353,23 @@ class AquariumEngine {
     // 2. Sunlight Caustics Rays
     this.renderCaustics();
 
-    // 3. Distant Ambient Motes
-    this.renderAmbientMotes();
-
-    // 4. Sea floor substrate & sand dunes
-    this.renderSeaFloor();
-
-    // 5. Background Kelp stalks
-    this.kelpStalks.forEach(k => {
-      PixelSprites.drawPixelKelp(ctx, k.x, k.baseY, k.height, this.timeSeconds, k.swayOffset);
+    // 3. Large Background Bubbles (giving deep aquatic atmosphere)
+    this.bgBubbles.forEach(b => {
+      PixelSprites.drawPixelBubble(ctx, b.x, b.y, b.radius, b.opacity);
     });
 
-    // 6. Scenery Props (Chest, Corals, Shells)
+    // 4. Distant Ambient Motes
+    this.renderAmbientMotes();
+
+    // 5. Background Kelp stalks (darker layer)
+    this.kelpStalks.filter(k => !k.isFront).forEach(k => {
+      PixelSprites.drawPixelKelp(ctx, k.x, k.baseY, k.height, this.timeSeconds, k.swayOffset, false);
+    });
+
+    // 6. Sea floor substrate & sand dunes
+    this.renderSeaFloor();
+
+    // 7. Large Corals and Chest on sea floor
     this.sceneryProps.forEach(prop => {
       const sprite = PixelSprites.getScenery(prop.type);
       if (sprite) {
@@ -352,20 +377,25 @@ class AquariumEngine {
       }
     });
 
-    // 7. Food Flakes
+    // 8. Foreground Kelp stalks (vibrant front layer)
+    this.kelpStalks.filter(k => k.isFront).forEach(k => {
+      PixelSprites.drawPixelKelp(ctx, k.x, k.baseY, k.height, this.timeSeconds, k.swayOffset, true);
+    });
+
+    // 9. Food Flakes
     this.foodFlakes.forEach(f => {
       PixelSprites.drawPixelFlake(ctx, f.x, f.y, Math.floor(f.animTime * 4));
     });
 
-    // 8. Fish Entities
+    // 10. Fish Entities (Bigger, cuter, distinct colors)
     this.fishList.forEach(fish => fish.render(ctx));
 
-    // 9. Bubbles
+    // 11. Foreground Bubbles from mouth & chest
     this.bubbles.forEach(b => {
       PixelSprites.drawPixelBubble(ctx, b.x, b.y, b.radius, b.opacity);
     });
 
-    // 10. Water Surface reflections & glass rim
+    // 12. Water Surface reflections & glass rim
     this.renderAquariumRim();
   }
 
@@ -374,18 +404,16 @@ class AquariumEngine {
     const grad = ctx.createLinearGradient(0, 0, 0, this.height);
 
     if (this.isNightMode) {
-      // Deep bioluminescent midnight
       grad.addColorStop(0, '#040d21');
       grad.addColorStop(0.3, '#071536');
       grad.addColorStop(0.7, '#081a3d');
       grad.addColorStop(1, '#030814');
     } else {
-      // Sunlit tropical crystal water
-      grad.addColorStop(0, '#1a73e8');
-      grad.addColorStop(0.15, '#0e52b5');
-      grad.addColorStop(0.45, '#073b88');
-      grad.addColorStop(0.8, '#052a65');
-      grad.addColorStop(1, '#031c44');
+      grad.addColorStop(0, '#1d75f2');
+      grad.addColorStop(0.18, '#1056bd');
+      grad.addColorStop(0.48, '#083e91');
+      grad.addColorStop(0.82, '#052a6b');
+      grad.addColorStop(1, '#031c47');
     }
 
     ctx.fillStyle = grad;
@@ -395,23 +423,23 @@ class AquariumEngine {
   renderCaustics() {
     const ctx = this.ctx;
     ctx.save();
-    const rayCount = 6;
+    const rayCount = 7;
     const t = this.timeSeconds * 0.6;
 
     for (let i = 0; i < rayCount; i++) {
       const angle = 0.12 * Math.sin(t + i * 1.3);
-      const startX = (i / rayCount) * this.width + Math.sin(t * 0.8 + i) * 60;
-      const widthTop = 40 + Math.sin(t + i) * 20;
-      const widthBottom = 130 + Math.cos(t * 0.7 + i) * 40;
+      const startX = (i / rayCount) * this.width + Math.sin(t * 0.8 + i) * 70;
+      const widthTop = 45 + Math.sin(t + i) * 22;
+      const widthBottom = 140 + Math.cos(t * 0.7 + i) * 45;
 
       const grad = ctx.createLinearGradient(0, 0, 0, this.height * 0.85);
       if (this.isNightMode) {
-        grad.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+        grad.addColorStop(0, 'rgba(56, 189, 248, 0.09)');
         grad.addColorStop(0.6, 'rgba(129, 140, 248, 0.03)');
         grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       } else {
-        grad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
-        grad.addColorStop(0.4, 'rgba(186, 230, 253, 0.06)');
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
+        grad.addColorStop(0.4, 'rgba(186, 230, 253, 0.07)');
         grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
       }
 
@@ -441,8 +469,7 @@ class AquariumEngine {
     const ctx = this.ctx;
     ctx.save();
 
-    // Sand dune gradient
-    const sandGrad = ctx.createLinearGradient(0, this.height - 50, 0, this.height);
+    const sandGrad = ctx.createLinearGradient(0, this.height - 55, 0, this.height);
     if (this.isNightMode) {
       sandGrad.addColorStop(0, '#1e293b');
       sandGrad.addColorStop(0.3, '#0f172a');
@@ -456,12 +483,11 @@ class AquariumEngine {
 
     ctx.fillStyle = sandGrad;
     ctx.beginPath();
-    ctx.moveTo(0, this.height - 35);
+    ctx.moveTo(0, this.height - 40);
 
-    // Gently rolling dunes
     const step = 40;
     for (let x = 0; x <= this.width + step; x += step) {
-      const duneY = (this.height - 35) + Math.sin(x * 0.015 + 1.2) * 8 + Math.cos(x * 0.03) * 4;
+      const duneY = (this.height - 40) + Math.sin(x * 0.015 + 1.2) * 8 + Math.cos(x * 0.03) * 4;
       ctx.lineTo(x, duneY);
     }
     ctx.lineTo(this.width, this.height);
@@ -469,11 +495,11 @@ class AquariumEngine {
     ctx.closePath();
     ctx.fill();
 
-    // Pixel gravel and shell flecks on sand
-    const fleckCount = Math.floor(this.width / 25);
+    // Pixel gravel on sand
+    const fleckCount = Math.floor(this.width / 20);
     for (let i = 0; i < fleckCount; i++) {
       const fx = (i / fleckCount) * this.width + ((i * 37) % 20);
-      const fy = (this.height - 24) + ((i * 13) % 18);
+      const fy = (this.height - 26) + ((i * 13) % 20);
       ctx.fillStyle = (i % 2 === 0) ? '#fde68a' : '#f59e0b';
       if (this.isNightMode) ctx.fillStyle = '#334155';
       ctx.fillRect(Math.round(fx), Math.round(fy), 2, 2);
@@ -486,7 +512,6 @@ class AquariumEngine {
     const ctx = this.ctx;
     ctx.save();
 
-    // Top water surface shimmer line
     const waterGrad = ctx.createLinearGradient(0, 0, this.width, 0);
     waterGrad.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
     waterGrad.addColorStop(0.5, 'rgba(186, 230, 253, 0.7)');
@@ -495,7 +520,6 @@ class AquariumEngine {
     ctx.fillStyle = waterGrad;
     ctx.fillRect(0, 0, this.width, 3);
 
-    // Tank glass side highlights
     ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
     ctx.fillRect(0, 0, 4, this.height);
     ctx.fillRect(this.width - 4, 0, 4, this.height);
@@ -506,6 +530,7 @@ class AquariumEngine {
 
 /**
  * FishEntity represents an autonomous product fish swimming in the tank.
+ * Bigger, simple, cute pixel art with smooth swimming wag.
  */
 class FishEntity {
   constructor(product, x, y, engine) {
@@ -514,50 +539,45 @@ class FishEntity {
 
     this.x = x;
     this.y = y;
-    this.vx = (Math.random() > 0.5 ? 1 : -1) * (0.8 + Math.random() * 0.6);
+    this.vx = (Math.random() > 0.5 ? 1 : -1) * (0.85 + Math.random() * 0.5);
     this.vy = (Math.random() - 0.5) * 0.4;
     this.facing = this.vx >= 0 ? 1 : -1;
 
-    // Waypoints & behavior
     this.targetX = this.x;
     this.targetY = this.y;
     this.pickNewWaypoint();
     this.waypointTimer = 2 + Math.random() * 4;
 
-    // Animation & State
     this.frames = PixelSprites.getFrames(product.species);
     this.currentFrame = 0;
     this.animTimer = 0;
-    this.animSpeed = 0.14; // seconds per frame
+    this.animSpeed = 0.16;
 
-    this.state = 'wandering'; // 'wandering' | 'curious' | 'chasing_food' | 'celebrating'
+    this.state = 'wandering';
     this.isHovered = false;
-    this.spinAngle = 0; // for celebratory spin
+    this.spinAngle = 0;
     this.isSpinning = false;
 
-    // Sprite scale & hit testing box
-    this.scale = 2.4;
-    this.frameWidth = this.frames[0] ? this.frames[0].width : 56;
-    this.frameHeight = this.frames[0] ? this.frames[0].height : 40;
+    // BIGGER SIZE: Scale 4.2 provides a prominent, adorable, high-visibility fish!
+    this.scale = 4.2;
+    this.frameWidth = this.frames[0] ? this.frames[0].width : 40;
+    this.frameHeight = this.frames[0] ? this.frames[0].height : 24;
     this.w = this.frameWidth * (this.scale / 2);
     this.h = this.frameHeight * (this.scale / 2);
 
-    // Mouth position offset for eating & bubbles
-    this.mouthOffset = { x: 20, y: 10 };
     this.bubbleTimer = 2 + Math.random() * 5;
   }
 
   pickNewWaypoint() {
-    const pad = 120;
+    const pad = 140;
     this.targetX = pad + Math.random() * (this.engine.width - pad * 2);
-    this.targetY = 120 + Math.random() * (this.engine.height - 220);
+    this.targetY = 130 + Math.random() * (this.engine.height - 240);
     this.waypointTimer = 4 + Math.random() * 6;
   }
 
   noticeFood(fx, fy) {
-    // If food is within reasonable range, swim to it!
     const dist = Math.hypot(fx - this.x, fy - this.y);
-    if (dist < 450) {
+    if (dist < 480) {
       this.targetX = fx;
       this.targetY = fy;
       this.state = 'chasing_food';
@@ -567,16 +587,15 @@ class FishEntity {
   celebrate() {
     this.isSpinning = true;
     this.spinAngle = 0;
-    // Release a celebratory burst of tiny bubbles
-    for (let i = 0; i < 6; i++) {
-      this.engine.spawnBubble(this.x + (Math.random() * 20 - 10), this.y + (Math.random() * 10 - 5), 2 + Math.random() * 3, 2);
+    for (let i = 0; i < 7; i++) {
+      this.engine.spawnBubble(this.x + (Math.random() * 24 - 12), this.y + (Math.random() * 12 - 6), 3 + Math.random() * 3, 2.2);
     }
   }
 
   containsPoint(px, py) {
-    // Generous bounding box for comfortable cursor click & hover
-    const hitW = Math.max(this.w * 1.3, 70);
-    const hitH = Math.max(this.h * 1.3, 50);
+    // Generous bounding box for comfortable cursor click & touch
+    const hitW = Math.max(this.w * 1.25, 88);
+    const hitH = Math.max(this.h * 1.35, 60);
     return (
       px >= this.x - hitW / 2 &&
       px <= this.x + hitW / 2 &&
@@ -586,14 +605,12 @@ class FishEntity {
   }
 
   update(dt, engine) {
-    // Animation frame advance
     this.animTimer += dt;
     if (this.animTimer >= this.animSpeed) {
       this.animTimer = 0;
       this.currentFrame = (this.currentFrame + 1) % this.frames.length;
     }
 
-    // Celebratory 360 spin
     if (this.isSpinning) {
       this.spinAngle += dt * 14;
       if (this.spinAngle >= Math.PI * 2) {
@@ -602,12 +619,12 @@ class FishEntity {
       }
     }
 
-    // Periodic bubbles from fish mouth
+    // Mouth bubbles (head is on the right when facing = 1, on the left when facing = -1)
     this.bubbleTimer -= dt;
     if (this.bubbleTimer <= 0) {
-      const mouthX = this.x + (this.facing === 1 ? this.w * 0.45 : -this.w * 0.45);
-      const mouthY = this.y - 2;
-      engine.spawnBubble(mouthX, mouthY, 2 + Math.random() * 2, 1.2);
+      const mouthX = this.x + (this.facing === 1 ? this.w * 0.42 : -this.w * 0.42);
+      const mouthY = this.y;
+      engine.spawnBubble(mouthX, mouthY, 2.5 + Math.random() * 2.5, 1.3);
       this.bubbleTimer = 4 + Math.random() * 7;
     }
 
@@ -629,12 +646,10 @@ class FishEntity {
         this.targetX = nearestFood.x;
         this.targetY = nearestFood.y;
 
-        // If close enough: eat!
-        if (minDist < 25) {
+        if (minDist < 30) {
           nearestFood.eaten = true;
           SoundFX.playNibble();
-          // spawn nibble crumbs
-          engine.spawnBubble(this.x, this.y - 6, 2, 1.8);
+          engine.spawnBubble(this.x, this.y - 10, 3, 2);
           this.state = 'wandering';
           this.pickNewWaypoint();
         }
@@ -643,67 +658,63 @@ class FishEntity {
       }
     }
 
-    // Cursor curiosity (if cursor is nearby, fish gently looks or steers towards it)
+    // Cursor curiosity
     if (engine.mouse.inside && this.state === 'wandering' && !this.isHovered) {
       const mouseDist = Math.hypot(engine.mouse.x - this.x, engine.mouse.y - this.y);
-      if (mouseDist < 160) {
+      if (mouseDist < 180) {
         this.targetX = engine.mouse.x;
         this.targetY = engine.mouse.y;
       }
     }
 
-    // Waypoint wandering update
+    // Waypoint timer
     this.waypointTimer -= dt;
     if (this.waypointTimer <= 0 && this.state === 'wandering') {
       this.pickNewWaypoint();
     }
 
-    // Steer towards target smoothly
     const dx = this.targetX - this.x;
     const dy = this.targetY - this.y;
     const distToTarget = Math.hypot(dx, dy);
 
-    const speed = this.isHovered ? 0.2 : (this.state === 'chasing_food' ? 1.9 : 0.9);
-    if (distToTarget > 10) {
+    const speed = this.isHovered ? 0.25 : (this.state === 'chasing_food' ? 2.1 : 1.0);
+    if (distToTarget > 12) {
       const targetVx = (dx / distToTarget) * speed;
       const targetVy = (dy / distToTarget) * (speed * 0.6);
 
-      // Smooth inertia
       this.vx += (targetVx - this.vx) * (dt * 1.5);
       this.vy += (targetVy - this.vy) * (dt * 1.5);
     }
 
-    // Position integration with gentle sinusoidal cruising bob
     this.x += this.vx;
-    this.y += this.vy + Math.sin(engine.timeSeconds * 2.5 + this.x * 0.05) * 0.25;
+    this.y += this.vy + Math.sin(engine.timeSeconds * 2.5 + this.x * 0.05) * 0.28;
 
-    // Facing direction
     if (this.vx > 0.08) this.facing = 1;
     else if (this.vx < -0.08) this.facing = -1;
 
-    // Tank boundaries containment
-    const padX = 70;
-    const topPad = 110;
-    const bottomPad = engine.height - 70;
+    // Boundaries
+    const padX = 85;
+    const topPad = 120;
+    const bottomPad = engine.height - 90;
 
     if (this.x < padX) {
       this.x = padX;
       this.vx = Math.abs(this.vx) * 0.8;
-      this.targetX = padX + 150;
+      this.targetX = padX + 160;
     } else if (this.x > engine.width - padX) {
       this.x = engine.width - padX;
       this.vx = -Math.abs(this.vx) * 0.8;
-      this.targetX = engine.width - padX - 150;
+      this.targetX = engine.width - padX - 160;
     }
 
     if (this.y < topPad) {
       this.y = topPad;
       this.vy = Math.abs(this.vy) * 0.8;
-      this.targetY = topPad + 100;
+      this.targetY = topPad + 110;
     } else if (this.y > bottomPad) {
       this.y = bottomPad;
       this.vy = -Math.abs(this.vy) * 0.8;
-      this.targetY = bottomPad - 100;
+      this.targetY = bottomPad - 110;
     }
   }
 
@@ -714,75 +725,68 @@ class FishEntity {
     ctx.save();
     ctx.translate(Math.round(this.x), Math.round(this.y));
 
-    // Spin or direction orientation
     if (this.isSpinning) {
       ctx.rotate(this.spinAngle);
     }
 
-    // Hover glow effect
+    // Glow highlight when hovered
     if (this.isHovered) {
       ctx.save();
       ctx.shadowColor = this.product.accentColor || '#38BDF8';
-      ctx.shadowBlur = 18;
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.shadowBlur = 22;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
       ctx.beginPath();
-      ctx.ellipse(0, 0, this.w * 0.7, this.h * 0.6, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 0, this.w * 0.65, this.h * 0.65, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
 
-    // Render pixel art sprite (flipped horizontally if swimming left)
+    // Facing right by default: scale(facing, 1) properly flips head when moving left
     ctx.scale(this.facing * (this.scale / 2), (this.scale / 2));
     ctx.drawImage(sprite, -sprite.width / 2, -sprite.height / 2);
 
     ctx.restore();
 
-    // Render floating product badge above fish
     this.renderBadge(ctx);
   }
 
   renderBadge(ctx) {
     const isHovered = this.isHovered;
-    const badgeY = Math.round(this.y - this.h * 0.65 - 18);
+    const badgeY = Math.round(this.y - this.h * 0.6 - 20);
     const badgeX = Math.round(this.x);
 
     ctx.save();
-    ctx.font = '600 11px "Pixelify Sans", monospace';
+    ctx.font = '600 12px "Pixelify Sans", monospace';
     const text = this.product.name;
     const textMetrics = ctx.measureText(text);
-    const badgeW = textMetrics.width + 20;
-    const badgeH = 20;
+    const badgeW = textMetrics.width + 24;
+    const badgeH = 22;
 
-    // Badge container background
-    const bgAlpha = isHovered ? 0.95 : 0.65;
-    ctx.fillStyle = isHovered ? 'rgba(15, 23, 42, ' + bgAlpha + ')' : 'rgba(15, 23, 42, ' + bgAlpha + ')';
+    const bgAlpha = isHovered ? 0.95 : 0.7;
+    ctx.fillStyle = 'rgba(15, 23, 42, ' + bgAlpha + ')';
     ctx.strokeStyle = isHovered ? (this.product.accentColor || '#38BDF8') : 'rgba(255, 255, 255, 0.25)';
     ctx.lineWidth = 1.5;
 
-    // Pixelated badge box
     const rx = Math.round(badgeX - badgeW / 2);
     const ry = Math.round(badgeY - badgeH / 2);
 
     ctx.fillRect(rx, ry, badgeW, badgeH);
     ctx.strokeRect(rx, ry, badgeW, badgeH);
 
-    // Accent indicator dot
     ctx.fillStyle = this.product.accentColor || '#38BDF8';
-    ctx.fillRect(rx + 6, ry + 6, 6, 6);
+    ctx.fillRect(rx + 6, ry + 7, 7, 7);
 
-    // Label text
     ctx.fillStyle = isHovered ? '#FFFFFF' : '#E2E8F0';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, rx + 16, ry + badgeH / 2 + 1);
+    ctx.fillText(text, rx + 18, ry + badgeH / 2 + 1);
 
-    // If hovered, draw small "Click to Inspect" hint
     if (isHovered) {
-      ctx.font = '500 9px "Plus Jakarta Sans", sans-serif';
+      ctx.font = '500 10px "Plus Jakarta Sans", sans-serif';
       const hint = 'Click to inspect product →';
       ctx.fillStyle = this.product.accentColor || '#38BDF8';
       ctx.textAlign = 'center';
-      ctx.fillText(hint, badgeX, badgeY + badgeH + 6);
+      ctx.fillText(hint, badgeX, badgeY + badgeH + 8);
     }
 
     ctx.restore();
