@@ -23,8 +23,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Invalid email address.' });
     }
 
-    // Destination email: configured in Vercel environment variable, fallback to default
-    const toEmail = process.env.CONTACT_RECEIVER_EMAIL || 'contact@wmlabs.ai';
+    // Destination emails: supports multiple comma-separated emails
+    const rawToEmails = process.env.CONTACT_RECEIVER_EMAIL || 'contact@wmlabs.ai';
+    const toEmails = rawToEmails
+      .split(',')
+      .map(e => e.trim())
+      .filter(e => e.length > 0);
     
     // Sender domain: can use onboarding@resend.dev initially or your verified domain
     const fromEmail = process.env.CONTACT_SENDER_EMAIL || 'WM Labs Contact <onboarding@resend.dev>';
@@ -32,7 +36,7 @@ export default async function handler(req, res) {
     // Send email via Resend API
     const data = await resend.emails.send({
       from: fromEmail,
-      to: [toEmail],
+      to: toEmails,
       replyTo: email,
       subject: `[WM Labs Transmission] ${subject || 'New Contact Submission'} — from ${name}`,
       html: `

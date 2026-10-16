@@ -109,7 +109,7 @@ To activate email delivery to your company inbox:
    - Open your project on the [Vercel Dashboard](https://vercel.com).
    - Navigate to **Settings** → **Environment Variables** and add:
      - `RESEND_API_KEY`: Your key from step 1 (e.g. `re_123456789...`)
-     - `CONTACT_RECEIVER_EMAIL`: Your company email where inquiries should arrive (e.g. `contact@yourdomain.com`).
+     - `CONTACT_RECEIVER_EMAIL`: Where inquiries should arrive. Can be one email or multiple separated by commas (e.g. `karla@wmlabs.ai, team@wmlabs.ai`).
      - *(Optional)* `CONTACT_SENDER_EMAIL`: Custom sender address (e.g. `WM Labs <contact@yourdomain.com>`) once your domain is verified on Resend. Defaults to `WM Labs Contact <onboarding@resend.dev>`.
 3. Deploy or `git push` — visitor submissions will instantly deliver to your company inbox with clean formatting and direct reply-to headers.
 
