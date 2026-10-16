@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     const fromEmail = process.env.CONTACT_SENDER_EMAIL || 'WM Labs Contact <onboarding@resend.dev>';
 
     // Send email via Resend API
-    const data = await resend.emails.send({
+    const response = await resend.emails.send({
       from: fromEmail,
       to: toEmails,
       replyTo: email,
@@ -73,9 +73,14 @@ export default async function handler(req, res) {
       `
     });
 
-    return res.status(200).json({ success: true, id: data.id });
+    if (response.error) {
+      console.error('Resend delivery error:', response.error);
+      return res.status(400).json({ success: false, error: response.error.message || 'Email delivery failed.' });
+    }
+
+    return res.status(200).json({ success: true, id: response.data?.id });
   } catch (err) {
-    console.error('Contact email error:', err);
+    console.error('Contact email exception:', err);
     return res.status(500).json({ success: false, error: err.message || 'Failed to send message.' });
   }
 }
