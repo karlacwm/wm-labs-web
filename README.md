@@ -71,14 +71,18 @@ The aquarium engine automatically spawns the new fish with collision avoidance, 
 
 ```text
 wm-labs-web/
+├── api/
+│   └── contact.js        # Vercel serverless function (Resend email delivery)
 ├── index.html            # Semantic HTML5 launch page, modal windows & backdrop
 ├── css/
 │   └── style.css         # Modern frosted-glass styling, pop-up modal & responsive layout
+├── fonts/                # Self-hosted TrueType fonts (Silkscreen, Press Start 2P)
 ├── js/
 │   ├── products-data.js  # Product registry (edit this to add/modify products)
 │   ├── pixel-sprites.js  # Procedural pixel art (fish palettes, corals, varied bubbles)
 │   ├── aquarium-engine.js# 60 FPS HTML5 Canvas simulation, collision avoidance & hit-testing
 │   └── app.js            # UI controller for navigation and product modal window
+├── package.json          # Node.js dependencies for Vercel serverless functions
 └── README.md             # Project documentation
 ```
 
@@ -90,6 +94,24 @@ wm-labs-web/
 - **Click Fish**: Opens the centered **Product Dossier Window** with specifications, key metrics, architecture highlights, and the **"Launch Product Page →"** link. Use the `◀ Prev Fish` / `Next Fish ▶` buttons to cycle through products.
 - **Autonomous Avoidance**: Fish actively detect proximity with other fish (`< 160px`) and steer away to prevent overlapping and collisions.
 - **Navigation Bar**: Centered menu with quick access to **Home**, **Products** (full R&D directory), **About Us**, and **Contact**.
+
+---
+
+## Contact Form Email Setup (Resend + Vercel)
+
+The **Contact Us** modal submits via a secure Vercel Serverless Function located at [`api/contact.js`](file:///c:/Users/Karla/OneDrive/Desktop/wm-labs-web/api/contact.js).
+
+To activate email delivery to your company inbox:
+1. **Get a free Resend API Key**:
+   - Sign up at [resend.com](https://resend.com) (free 3,000 emails/month).
+   - Go to **API Keys** → **Create API Key** (starts with `re_...`).
+2. **Add Environment Variables in Vercel**:
+   - Open your project on the [Vercel Dashboard](https://vercel.com).
+   - Navigate to **Settings** → **Environment Variables** and add:
+     - `RESEND_API_KEY`: Your key from step 1 (e.g. `re_123456789...`)
+     - `CONTACT_RECEIVER_EMAIL`: Your company email where inquiries should arrive (e.g. `contact@yourdomain.com`).
+     - *(Optional)* `CONTACT_SENDER_EMAIL`: Custom sender address (e.g. `WM Labs <contact@yourdomain.com>`) once your domain is verified on Resend. Defaults to `WM Labs Contact <onboarding@resend.dev>`.
+3. Deploy or `git push` — visitor submissions will instantly deliver to your company inbox with clean formatting and direct reply-to headers.
 
 ---
 

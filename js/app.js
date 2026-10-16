@@ -240,14 +240,59 @@ document.addEventListener('DOMContentLoaded', () => {
     navContactBtn.classList.add('active');
   });
 
-  // Contact form submission
+  // Contact form submission via Vercel Serverless Function (/api/contact)
   const contactForm = document.getElementById('contact-form');
+  const contactStatus = document.getElementById('contact-status');
+  const contactSubmitBtn = document.getElementById('contact-submit-btn');
+
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      alert('Thank you! Your message has been sent to the WM Labs team.');
-      contactForm.reset();
-      closeAllModals();
+
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const subject = document.getElementById('contact-subject').value.trim();
+      const message = document.getElementById('contact-message').value.trim();
+
+      if (!name || !email || !message) return;
+
+      // Set loading state
+      contactSubmitBtn.disabled = true;
+      contactSubmitBtn.style.opacity = '0.6';
+      contactSubmitBtn.innerHTML = `Transmitting <span>...</span>`;
+      contactStatus.style.display = 'none';
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, subject, message })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          contactStatus.style.display = 'block';
+          contactStatus.className = 'contact-status-msg status-success';
+          contactStatus.textContent = 'Transmission received! The WM Labs team will respond shortly.';
+          contactForm.reset();
+
+          setTimeout(() => {
+            contactStatus.style.display = 'none';
+            closeAllModals();
+          }, 3500);
+        } else {
+          throw new Error(result.error || 'Server error occurred.');
+        }
+      } catch (err) {
+        contactStatus.style.display = 'block';
+        contactStatus.className = 'contact-status-msg status-error';
+        contactStatus.textContent = err.message || 'Transmission failed. Please verify your connection or try again.';
+      } finally {
+        contactSubmitBtn.disabled = false;
+        contactSubmitBtn.style.opacity = '1';
+        contactSubmitBtn.innerHTML = `Send Transmission <span>→</span>`;
+      }
     });
   }
 

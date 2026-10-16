@@ -1,0 +1,12 @@
+{
+  "name": "wm-labs-web",
+  "version": "1.0.0",
+  "description": "WM Labs Interactive Pixel Aquarium Launchpad",
+  "private": true,
+  "scripts": {
+    "start": "python -m http.server 8080"
+  },
+  "dependencies": {
+    "resend": "^4.1.2"
+  }
+}
